@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Queen Ri's Hive 🐝</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #2F5233;
+      --panel: rgba(210, 180, 140, 0.95);
+      --accent: #8B6914;
+      --accent-dark: #6B5416;
+      --txt: #1B3B1E;
+      --txt-bright: #D2B48C;
+      --flower: #A0522D;
+      --leaf: #6B8E3D;
+    }
+    * { box-sizing: border-box }
+    html, body { 
+      height: 100%; 
+      margin: 0; 
+      font-family: "Nunito", sans-serif; 
+      background: linear-gradient(to bottom, #4A5D23 0%, #6B8E3D 50%, #2F5233 100%); 
+      color: var(--txt);
+      font-weight: 600;
+    }
+    h1 { 
+      font-family: "Playfair Display", serif; 
+      font-size: 2.6rem; 
+      margin: 0; 
+      text-align: center; 
+      color: var(--txt); 
+      letter-spacing: .5px;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(210,180,140,0.6);
+    }
+
+    #shell {
+      max-width: 1400px;
+      margin: 2rem auto;
+      background: var(--panel);
+      border-radius: 16px;
+      padding: 2rem 1.5rem 3rem;
+      box-shadow: 0 0 40px rgba(0,0,0,.4);
+      border: 3px solid var(--accent);
+    }
+
+    #gameCanvas { 
+      display: block; 
+      margin: 2rem auto; 
+      border-radius: 12px; 
+      background: linear-gradient(to bottom, #6B8E3D 0%, #4A5D23 70%, #2F5233 100%);
+      border: 3px solid var(--accent);
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
+
+    #score { 
+      font-family: "Playfair Display", serif; 
+      font-size: 2rem; 
+      text-align: center; 
+      margin-top: .5rem; 
+      color: var(--txt);
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(210,180,140,0.6);
+      background: rgba(210,180,140,0.4);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      display: inline-block;
+    }
+
+    .menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(210, 180, 140, 0.98);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+    }
+
+    .menu.hidden {
+      display: none;
+    }
+
+    .menu h2 {
+      font-family: "Playfair Display", serif;
+      font-size: 2.2rem;
+      color: var(--txt);
+      margin: 0;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(210,180,140,0.6);
+    }
+
+    .menu-content {
+      background: var(--panel);
+      padding: 2.5rem;
+      border-radius: 16px;
+      text-align: center;
+      max-width: 450px;
+      width: 90%;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 30px rgba(0,0,0,0.4);
+    }
+
+    .menu-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .menu-btn {
+      background: var(--accent);
+      color: var(--txt-bright);
+      border: 2px solid var(--accent-dark);
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: "Nunito", sans-serif;
+      font-weight: 700;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .menu-btn:hover {
+      background: var(--accent-dark);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    }
+
+    .instructions {
+      color: var(--txt);
+      font-weight: 600;
+      text-shadow: 1px 1px 2px rgba(210,180,140,0.6);
+      margin: 1rem 0;
+      line-height: 1.5;
+    }
+
+    #finalScore, #highScore {
+      font-family: "Playfair Display", serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--txt);
+      text-shadow: 2px 2px 4px rgba(210,180,140,0.6);
+      margin: 0.5rem 0;
+    }
+
+    .controls {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .controls button {
+      background: var(--accent);
+      color: var(--txt-bright);
+      border: 2px solid var(--accent-dark);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 600;
+      margin: 0 0.5rem;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .controls button:hover {
+      background: var(--accent-dark);
+    }
+  </style>
+</head>
+<body>
+  <div id="shell">
+    <h1>Queen Ri's Hive 🐝</h1>
+    <canvas id="gameCanvas" width="1200" height="600"></canvas>
+    <div id="score">🌸 Score: 0 | Evil Bees: 0/7</div>
+    <div class="back-link" style="text-align: center; margin-top: 1.5rem;">
+      <a href="index.html" style="color: var(--accent-dark); text-decoration: none; font-weight: 700; font-size: 1.1rem; font-family: 'Nunito', sans-serif;">← Back to Forest Clearing</a>
+    </div>
+  </div>
+
+  <audio id="bgMusic" loop>
+    <source src="Instrumental Cariño - The Marías.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="bloomSound" preload="auto">
+    <source src="sharp-pop-328170.mp3" type="audio/mpeg">
+  </audio>
+  <div id="startMenu" class="menu">
+    <div class="menu-content">
+      <h2>Queen Ri's Hive 🐝</h2>
+      <div class="instructions">
+        Fly through the garden as Queen Ri and pollinate flower buds!<br>
+        <strong>Use Arrow Keys or WASD</strong> to fly around the garden<br>
+        Touch buds to pollinate them and watch beautiful flowers bloom! 🌸<br>
+        <em>Be quick - flowers will wither if neglected too long!</em>
+      </div>
+      <div class="menu-buttons">
+        <button class="menu-btn" id="startGame">Start Flying</button>
+        <a href="index.html" style="color: var(--accent-dark); text-decoration: none; font-weight: 700; font-size: 1.1rem; font-family: 'Nunito', sans-serif; margin-top: 1rem; display: inline-block;">← Back to Forest Clearing</a>
+      </div>
+    </div>
+  </div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const scoreEl = document.getElementById('score');
+
+const bgMusic = document.getElementById('bgMusic');
+const bloomSound = document.getElementById('bloomSound');
+
+// Add audio controls
+let isMuted = false;
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+function setupAudio() {
+  bgMusic.volume = 0.3;
+  bloomSound.volume = 0.6;
+  // Add audio context resume on user interaction
+  document.addEventListener('click', () => {
+    if (audioContext.state === 'suspended') {
+      audioContext.resume();
+    }
+  }, { once: true });
+}
+
+function toggleMute() {
+  isMuted = !isMuted;
+  bgMusic.muted = isMuted;
+  bloomSound.muted = isMuted;
+  this.textContent = isMuted ? '🔇 Sound Off' : '🔊 Sound On';
+}
+
+function playSound(sound) {
+  if (!isMuted && audioContext.state === 'running') {
+    sound.currentTime = 0;
+    sound.play().catch(err => console.log('Sound play error:', err));
+  }
+}
+
+let frameId;
+let gameStarted = false;
+
+// Movement controls
+const keys = {};
+const MOVE_SPEED = 4;
+
+// Game state
+let score = 0;
+let gameTime = 0;
+let evilBeeSpawnTimer = 0;
+let gameOver = false;
+
+// Expanded planter positions for bigger garden
+const PLANTERS = [
+  // Bottom row
+  {x: 50, y: 450, w: 120, h: 80},
+  {x: 220, y: 480, w: 100, h: 70},
+  {x: 380, y: 460, w: 130, h: 85},
+  {x: 550, y: 470, w: 110, h: 75},
+  {x: 720, y: 450, w: 125, h: 80},
+  {x: 890, y: 480, w: 100, h: 70},
+  {x: 1060, y: 460, w: 115, h: 75},
+  
+  // Middle row
+  {x: 120, y: 300, w: 115, h: 70},
+  {x: 290, y: 320, w: 120, h: 75},
+  {x: 460, y: 310, w: 110, h: 80},
+  {x: 630, y: 320, w: 125, h: 70},
+  {x: 800, y: 300, w: 110, h: 80},
+  {x: 970, y: 320, w: 120, h: 75},
+  
+  // Top row
+  {x: 180, y: 150, w: 125, h: 80},
+  {x: 400, y: 130, w: 110, h: 75},
+  {x: 620, y: 160, w: 120, h: 80},
+  {x: 840, y: 140, w: 115, h: 75}
+];
+
+// Enhanced flower types with different values and growth times
+const FLOWER_TYPES = [
+  {name: 'daisy', points: 5, growthDelay: 45}, // Fast, low value
+  {name: 'wildflower', points: 8, growthDelay: 60}, // Normal
+  {name: 'tulip', points: 12, growthDelay: 75}, // Slow, medium value
+  {name: 'rose', points: 18, growthDelay: 90}, // Slower, high value
+  {name: 'sunflower', points: 25, growthDelay: 120} // Slowest, highest value
+];
+
+const FLOWER_COLORS = {
+  rose: ['#FF69B4', '#FF1493', '#C71585'],
+  tulip: ['#FF6347', '#FFD700', '#FF4500'],
+  sunflower: ['#FFD700', '#FFA500', '#8B4513'],
+  daisy: ['#FFFFFF', '#FFD700', '#90EE90'],
+  wildflower: ['#9370DB', '#FF69B4', '#32CD32']
+};
+
+const flowers = [];
+const evilBees = [];
+
+class EvilBee {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.w = 35;
+    this.h = 25;
+    this.vx = (Math.random() - 0.5) * 3;
+    this.vy = (Math.random() - 0.5) * 3;
+    this.flapAnimation = Math.random() * Math.PI * 2;
+    this.directionChangeTimer = 0;
+    this.lastFlowerDamage = 0;
+  }
+  
+  update() {
+    this.flapAnimation += 0.25;
+    this.directionChangeTimer++;
+    this.lastFlowerDamage++;
+    
+    // Random direction changes
+    if (this.directionChangeTimer > 120 + Math.random() * 120) { // 2-4 seconds
+      this.vx = (Math.random() - 0.5) * 4;
+      this.vy = (Math.random() - 0.5) * 4;
+      this.directionChangeTimer = 0;
+    }
+    
+    // Small random movements
+    this.vx += (Math.random() - 0.5) * 0.2;
+    this.vy += (Math.random() - 0.5) * 0.2;
+    
+    // Limit speed
+    const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+    if (speed > 3) {
+      this.vx = (this.vx / speed) * 3;
+      this.vy = (this.vy / speed) * 3;
+    }
+    
+    // Update position
+    this.x += this.vx;
+    this.y += this.vy;
+    
+    // Bounce off walls
+    if (this.x < 0 || this.x > canvas.width - this.w) {
+      this.vx = -this.vx;
+      this.x = Math.max(0, Math.min(this.x, canvas.width - this.w));
+    }
+    if (this.y < 0 || this.y > canvas.height - this.h) {
+      this.vy = -this.vy;
+      this.y = Math.max(0, Math.min(this.y, canvas.height - this.h));
+    }
+  }
+  
+  draw() {
+    ctx.save();
+    ctx.translate(this.x + this.w/2, this.y + this.h/2);
+    
+    const hoverOffset = Math.sin(this.flapAnimation) * 1;
+    ctx.translate(0, hoverOffset);
+    
+    const wingFlap = Math.sin(this.flapAnimation * 3) * 20;
+    
+    // Evil bee wings (darker)
+    ctx.fillStyle = 'rgba(100, 100, 120, 0.8)';
+    ctx.save();
+    ctx.rotate(wingFlap * Math.PI / 180);
+    ctx.fillRect(-12, -6, 12, 6);
+    ctx.fillRect(-12, 2, 12, 6);
+    ctx.restore();
+    
+    ctx.save();
+    ctx.rotate((-wingFlap) * Math.PI / 180);
+    ctx.fillRect(0, -6, 12, 6);
+    ctx.fillRect(0, 2, 12, 6);
+    ctx.restore();
+    
+    // Evil bee body (darker colors)
+    ctx.fillStyle = '#4A4A4A';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 12, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Red stripes instead of black
+    ctx.fillStyle = '#8B0000';
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.ellipse(0, -2 + i * 3, 11, 1.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    
+    // Evil red eyes
+    ctx.fillStyle = '#FF0000';
+    ctx.beginPath();
+    ctx.arc(-3, -8, 2, 0, Math.PI * 2);
+    ctx.arc(3, -8, 2, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.restore();
+  }
+  
+  checkFlowerCollision() {
+    if (this.lastFlowerDamage < 60) return; // Damage cooldown
+    
+    flowers.forEach(flower => {
+      const dx = this.x + this.w/2 - flower.x;
+      const dy = this.y + this.h/2 - flower.y;
+      const distance = Math.sqrt(dx*dx + dy*dy);
+      
+      if (distance < 35) {
+        flower.damage();
+        this.lastFlowerDamage = 0;
+      }
+    });
+  }
+}
+
+class Flower {
+  constructor(planter) {
+    this.planter = planter;
+    this.x = planter.x + planter.w / 2;
+    this.y = planter.y + 10;
+    this.flowerType = FLOWER_TYPES[Math.floor(Math.random() * FLOWER_TYPES.length)];
+    this.type = this.flowerType.name;
+    this.points = this.flowerType.points;
+    this.growthDelay = this.flowerType.growthDelay;
+    this.colors = FLOWER_COLORS[this.type];
+    this.stage = 'bud'; // bud -> small -> medium -> big -> pop
+    this.size = 0.3;
+    this.targetSize = 0.3;
+    this.growthTime = 0;
+    this.readyToAdvance = false;
+    this.popTimer = 0;
+    this.swayOffset = Math.random() * Math.PI * 2;
+    this.bloomTime = 0;
+    this.particles = [];
+    this.health = 3; // Flowers can take 3 hits before dying
+  }
+  
+  pollinate() {
+    if (this.readyToAdvance) return;
+    
+    this.readyToAdvance = true;
+    this.growthTime = 0;
+    
+    // Create pollination particles
+    for (let i = 0; i < 8; i++) {
+      this.particles.push({
+        x: this.x + (Math.random() - 0.5) * 30,
+        y: this.y + (Math.random() - 0.5) * 30,
+        vx: (Math.random() - 0.5) * 4,
+        vy: (Math.random() - 0.5) * 4,
+        life: 30,
+        maxLife: 30,
+        color: this.colors[Math.floor(Math.random() * this.colors.length)]
+      });
+    }
+  }
+  
+  damage() {
+    this.health--;
+    
+    // Create damage particles
+    for (let i = 0; i < 5; i++) {
+      this.particles.push({
+        x: this.x + (Math.random() - 0.5) * 20,
+        y: this.y + (Math.random() - 0.5) * 20,
+        vx: (Math.random() - 0.5) * 6,
+        vy: (Math.random() - 0.5) * 6,
+        life: 20,
+        maxLife: 20,
+        color: '#8B0000'
+      });
+    }
+    
+    if (this.health <= 0) {
+      this.reset();
+    } else {
+      // Reduce growth progress
+      if (this.stage !== 'bud') {
+        switch (this.stage) {
+          case 'big':
+            this.stage = 'medium';
+            this.targetSize = 0.8;
+            this.popTimer = 0;
+            break;
+          case 'medium':
+            this.stage = 'small';
+            this.targetSize = 0.6;
+            break;
+          case 'small':
+            this.stage = 'bud';
+            this.targetSize = 0.3;
+            break;
+        }
+        this.readyToAdvance = false;
+        this.growthTime = 0;
+      }
+    }
+  }
+  
+  reset() {
+    this.stage = 'bud';
+    this.size = 0.3;
+    this.targetSize = 0.3;
+    this.readyToAdvance = false;
+    this.growthTime = 0;
+    this.popTimer = 0;
+    this.health = 3;
+    this.flowerType = FLOWER_TYPES[Math.floor(Math.random() * FLOWER_TYPES.length)];
+    this.type = this.flowerType.name;
+    this.points = this.flowerType.points;
+    this.growthDelay = this.flowerType.growthDelay;
+    this.colors = FLOWER_COLORS[this.type];
+  }
+  
+  update() {
+    this.bloomTime += 0.02;
+    
+    // Handle growth progression with different delays
+    if (this.readyToAdvance) {
+      this.growthTime++;
+      
+      if (this.growthTime > this.growthDelay) {
+        switch (this.stage) {
+          case 'bud':
+            this.stage = 'small';
+            this.targetSize = 0.6;
+            break;
+          case 'small':
+            this.stage = 'medium';
+            this.targetSize = 0.8;
+            break;
+          case 'medium':
+            this.stage = 'big';
+            this.targetSize = 1.0;
+            break;
+        }
+        this.readyToAdvance = false;
+        this.growthTime = 0;
+      }
+    }
+    
+    // Handle big flower pop timer
+    if (this.stage === 'big') {
+      this.popTimer++;
+      if (this.popTimer > 180) { // 3 seconds
+        this.pop();
+        return;
+      }
+    }
+    
+    // Smooth size transition
+    if (this.size < this.targetSize) {
+      this.size += 0.01;
+    }
+    
+    // Update particles
+    this.particles = this.particles.filter(p => p.life > 0);
+    this.particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.05;
+      p.vx *= 0.98;
+      p.life--;
+    });
+  }
+  
+  pop() {
+    // Award points based on flower type
+    score += this.points;
+    
+    // Play pop sound with new function
+    playSound(bloomSound);
+    
+    // Create explosion particles
+    for (let i = 0; i < 15; i++) {
+      this.particles.push({
+        x: this.x,
+        y: this.y,
+        vx: (Math.random() - 0.5) * 8,
+        vy: (Math.random() - 0.5) * 8,
+        life: 40,
+        maxLife: 40,
+        color: this.colors[Math.floor(Math.random() * this.colors.length)]
+      });
+    }
+    
+    // Reset to new bud after short delay
+    setTimeout(() => this.reset(), 500);
+  }
+  
+  draw() {
+    const sway = Math.sin(this.bloomTime + this.swayOffset) * 1;
+    
+    ctx.save();
+    ctx.translate(this.x + sway, this.y);
+    ctx.scale(this.size, this.size);
+    
+    // Flash red when damaged
+    if (this.health < 3) {
+      ctx.globalAlpha = 0.8 + Math.sin(this.bloomTime * 8) * 0.2;
+    }
+    
+    if (this.stage === 'bud') {
+      this.drawBud();
+    } else {
+      this.drawStem();
+      this.drawFlower();
+    }
+    
+    ctx.restore();
+    
+    // Draw health indicator
+    if (this.health < 3) {
+      ctx.fillStyle = `rgba(139, 0, 0, 0.8)`;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y - 20, 8, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.fillStyle = '#D2B48C';
+      ctx.font = '12px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(this.health.toString(), this.x, this.y - 16);
+    }
+    
+    // Draw particles
+    this.particles.forEach(p => {
+      const alpha = p.life / p.maxLife;
+      ctx.fillStyle = `${p.color}${Math.floor(alpha * 255).toString(16).padStart(2, '0')}`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3 * alpha, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+  
+  drawBud() {
+    ctx.fillStyle = '#228B22';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 8, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Small leaves
+    ctx.fillStyle = '#90EE90';
+    ctx.fillRect(-6, 8, 4, 2);
+    ctx.fillRect(2, 8, 4, 2);
+  }
+  
+  drawStem() {
+    ctx.fillStyle = '#228B22';
+    ctx.fillRect(-2, 0, 4, 25);
+    
+    // Leaves
+    ctx.fillStyle = '#90EE90';
+    ctx.fillRect(-8, 8, 6, 3);
+    ctx.fillRect(2, 10, 6, 3);
+  }
+  
+  drawFlower() {
+    let petalSize = 8;
+    let centerSize = 4;
+    
+    if (this.stage === 'medium') {
+      petalSize = 12;
+      centerSize = 6;
+    } else if (this.stage === 'big') {
+      petalSize = 16;
+      centerSize = 8;
+    }
+    
+    if (this.type === 'sunflower') {
+      this.drawSunflower(petalSize, centerSize);
+    } else if (this.type === 'rose') {
+      this.drawRose(petalSize, centerSize);
+    } else if (this.type === 'tulip') {
+      this.drawTulip(petalSize, centerSize);
+    } else if (this.type === 'daisy') {
+      this.drawDaisy(petalSize, centerSize);
+    } else {
+      this.drawWildflower(petalSize, centerSize);
+    }
+  }
+  
+  drawSunflower(petalSize, centerSize) {
+    // Petals
+    for (let i = 0; i < 12; i++) {
+      const angle = (i / 12) * Math.PI * 2;
+      ctx.fillStyle = this.colors[0];
+      ctx.save();
+      ctx.rotate(angle);
+      ctx.fillRect(-2, -petalSize - 5, 4, petalSize);
+      ctx.restore();
+    }
+    
+    // Center
+    ctx.fillStyle = this.colors[2];
+    ctx.beginPath();
+    ctx.arc(0, -5, centerSize, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  drawRose(petalSize, centerSize) {
+    ctx.fillStyle = this.colors[0];
+    for (let i = 0; i < 6; i++) {
+      const angle = (i / 6) * Math.PI * 2;
+      ctx.save();
+      ctx.rotate(angle);
+      ctx.beginPath();
+      ctx.ellipse(0, -8, petalSize * 0.6, petalSize * 0.8, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    
+    ctx.fillStyle = this.colors[1];
+    ctx.beginPath();
+    ctx.arc(0, -8, centerSize, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  drawTulip(petalSize, centerSize) {
+    ctx.fillStyle = this.colors[0];
+    ctx.beginPath();
+    ctx.ellipse(0, -10, petalSize, petalSize * 1.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.fillStyle = this.colors[1];
+    ctx.beginPath();
+    ctx.ellipse(0, -12, centerSize, centerSize * 1.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  drawDaisy(petalSize, centerSize) {
+    // Petals
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2;
+      ctx.fillStyle = this.colors[0];
+      ctx.save();
+      ctx.rotate(angle);
+      ctx.beginPath();
+      ctx.ellipse(0, -petalSize, 3, petalSize * 0.6, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    
+    // Center
+    ctx.fillStyle = this.colors[1];
+    ctx.beginPath();
+    ctx.arc(0, -5, centerSize, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  drawWildflower(petalSize, centerSize) {
+    for (let i = 0; i < 6; i++) {
+      const angle = (i / 6) * Math.PI * 2;
+      ctx.fillStyle = this.colors[i % this.colors.length];
+      ctx.save();
+      ctx.rotate(angle);
+      ctx.beginPath();
+      ctx.ellipse(0, -petalSize * 0.8, 4, petalSize * 0.8, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+}
+
+function initializeFlowers() {
+  flowers.length = 0;
+  PLANTERS.forEach(planter => {
+    flowers.push(new Flower(planter));
+  });
+}
+
+function spawnEvilBee() {
+  if (evilBees.length < 7) {
+    evilBees.push(new EvilBee());
+  }
+}
+
+function checkCollisions() {
+  flowers.forEach(flower => {
+    const dx = queenBee.x + queenBee.w/2 - flower.x;
+    const dy = queenBee.y + queenBee.h/2 - flower.y;
+    const distance = Math.sqrt(dx*dx + dy*dy);
+    
+    if (distance < 40) {
+      flower.pollinate();
+    }
+  });
+}
+
+function checkEvilBeeCollisions() {
+  evilBees.forEach(evilBee => {
+    const dx = queenBee.x + queenBee.w/2 - (evilBee.x + evilBee.w/2);
+    const dy = queenBee.y + queenBee.h/2 - (evilBee.y + evilBee.h/2);
+    const distance = Math.sqrt(dx*dx + dy*dy);
+    
+    if (distance < 30) {
+      gameOver = true;
+    }
+  });
+}
+
+function drawGameOver() {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  ctx.fillStyle = '#D2B48C';
+  ctx.font = 'bold 48px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('GAME OVER', canvas.width/2, canvas.height/2 - 60);
+  
+  ctx.font = '32px Arial';
+  ctx.fillText(`Final Score: ${score}`, canvas.width/2, canvas.height/2);
+  
+  ctx.font = '24px Arial';
+  ctx.fillText('Press R to restart', canvas.width/2, canvas.height/2 + 50);
+  
+  // Hide sound button
+  const soundBtn = document.getElementById('soundToggleBtn');
+  if (soundBtn) soundBtn.style.display = 'none';
+}
+
+function updateScore() {
+  const evilBeeCount = evilBees.length;
+  scoreEl.textContent = `🌸 Score: ${score} | Evil Bees: ${evilBeeCount}/7`;
+}
+
+let last = performance.now();
+function gameLoop(now) {
+  const dt = now - last;
+  last = now;
+  
+  if (gameOver) {
+    drawGameOver();
+    return;
+  }
+  
+  // Update game time and spawn evil bees
+  gameTime++;
+  evilBeeSpawnTimer++;
+  
+  // Spawn evil bees over time (starting with 1, up to 7) - much slower now
+  if (evilBeeSpawnTimer > 3600) { // Every 60 seconds (was 10 seconds)
+    spawnEvilBee();
+    evilBeeSpawnTimer = 0;
+  }
+  
+  // Draw detailed background
+  drawBackground();
+  
+  // Draw static garden elements
+  drawPlanters();
+  
+  // Update and draw flowers
+  flowers.forEach(flower => flower.update());
+  flowers.forEach(flower => flower.draw());
+  
+  // Update and draw evil bees
+  evilBees.forEach(evilBee => {
+    evilBee.update();
+    evilBee.draw();
+    evilBee.checkFlowerCollision();
+  });
+  
+  // Update and draw bee
+  queenBee.update();
+  queenBee.draw();
+  
+  // Check for collisions
+  checkCollisions();
+  checkEvilBeeCollisions();
+  
+  updateScore();
+  
+  frameId = requestAnimationFrame(gameLoop);
+}
+
+function startGame() {
+  console.log('Starting game...');
+  gameStarted = true;
+  gameOver = false;
+  score = 0;
+  gameTime = 0;
+  evilBeeSpawnTimer = 0;
+  
+  // Clear all key states to prevent stuck movement
+  Object.keys(keys).forEach(key => keys[key] = false);
+  
+  // Clear evil bees and spawn first one
+  evilBees.length = 0;
+  spawnEvilBee();
+  
+  // Initialize flowers in planters
+  initializeFlowers();
+  
+  // Reset bee position and movement
+  queenBee.x = canvas.width / 2;
+  queenBee.y = canvas.height / 2;
+  queenBee.vx = 0;
+  queenBee.vy = 0;
+  queenBee.flapAnimation = 0;
+  queenBee.trailParticles = [];
+  
+  document.getElementById('startMenu').classList.add('hidden');
+  // Show sound button
+  let soundBtn = document.getElementById('soundToggleBtn');
+  if (!soundBtn) {
+    soundBtn = document.createElement('button');
+    soundBtn.id = 'soundToggleBtn';
+    soundBtn.style.position = 'fixed';
+    soundBtn.style.top = '30px';
+    soundBtn.style.left = '30px';
+    soundBtn.style.zIndex = '1300';
+    soundBtn.style.background = '#fffbe6';
+    soundBtn.style.color = '#6B8E3D';
+    soundBtn.style.border = '2px dashed #bfa76a';
+    soundBtn.style.borderRadius = '8px';
+    soundBtn.style.padding = '0.5rem 1.2rem';
+    soundBtn.style.fontFamily = "'Playfair Display', serif";
+    soundBtn.style.fontSize = '1.1rem';
+    soundBtn.style.fontWeight = '700';
+    soundBtn.style.cursor = 'pointer';
+    soundBtn.style.boxShadow = '2px 4px 12px rgba(0,0,0,0.13)';
+    soundBtn.textContent = '🔊 Sound On';
+    soundBtn.style.display = 'none';
+    document.body.appendChild(soundBtn);
+    let isMuted = false;
+    soundBtn.addEventListener('click', () => {
+      isMuted = !isMuted;
+      bgMusic.muted = isMuted;
+      bloomSound.muted = isMuted;
+      soundBtn.textContent = isMuted ? '🔇 Sound Off' : '🔊 Sound On';
+    });
+  }
+  soundBtn.style.display = 'block';
+  last = performance.now();
+  frameId = requestAnimationFrame(gameLoop);
+  
+  // Play music with better error handling
+  bgMusic.currentTime = 0;
+  bgMusic.play().catch(err => console.log('Music play error:', err));
+}
+
+document.getElementById('startGame').addEventListener('click', startGame);
+
+// Keyboard event listeners
+window.addEventListener('keydown', e => {
+  if (gameStarted && !gameOver) {
+    keys[e.code] = true;
+    e.preventDefault();
+  } else if (gameOver && e.code === 'KeyR') {
+    startGame();
+    e.preventDefault();
+  }
+});
+
+window.addEventListener('keyup', e => {
+  if (gameStarted && !gameOver) {
+    keys[e.code] = false;
+    e.preventDefault();
+  }
+});
+
+// Show start menu
+document.getElementById('startMenu').classList.remove('hidden');
+
+const queenBee = {
+  x: 100,
+  y: 300,
+  w: 50,
+  h: 35,
+  vx: 0,
+  vy: 0,
+  flapAnimation: 0,
+  trailParticles: [],
+  
+  draw() {
+    this.flapAnimation += 0.15;
+    
+    ctx.save();
+    ctx.translate(this.x + this.w/2, this.y + this.h/2);
+    
+    // Gentle hovering motion
+    const hoverOffset = Math.sin(this.flapAnimation * 0.8) * 1.5;
+    ctx.translate(0, hoverOffset);
+    
+    // Wing flapping
+    const leftWingAngle = Math.sin(this.flapAnimation * 4) * 25;
+    const rightWingAngle = Math.sin(this.flapAnimation * 4 + 0.3) * 25;
+    
+    // Draw wings (behind body)
+    ctx.fillStyle = 'rgba(220, 220, 255, 0.8)';
+    ctx.strokeStyle = 'rgba(150, 150, 200, 0.6)';
+    ctx.lineWidth = 1;
+    
+    // Left wing
+    ctx.save();
+    ctx.rotate((leftWingAngle - 10) * Math.PI / 180);
+    ctx.beginPath();
+    ctx.ellipse(-15, -8, 18, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+    
+    // Right wing
+    ctx.save();
+    ctx.rotate((rightWingAngle + 10) * Math.PI / 180);
+    ctx.beginPath();
+    ctx.ellipse(15, -8, 18, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+    
+    // Bee body (thorax)
+    ctx.fillStyle = '#8B4513';
+    ctx.beginPath();
+    ctx.ellipse(0, -5, 12, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Bee abdomen (striped)
+    ctx.fillStyle = '#FFD700';
+    ctx.beginPath();
+    ctx.ellipse(0, 5, 15, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Black stripes on abdomen
+    ctx.fillStyle = '#000000';
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.ellipse(0, 2 + i * 4, 14, 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    
+    // Head
+    ctx.fillStyle = '#8B4513';
+    ctx.beginPath();
+    ctx.arc(0, -18, 10, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Eyes
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.arc(-4, -20, 3, 0, Math.PI * 2);
+    ctx.arc(4, -20, 3, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Eye highlights
+    ctx.fillStyle = '#D2B48C';
+    ctx.beginPath();
+    ctx.arc(-3, -21, 1, 0, Math.PI * 2);
+    ctx.arc(5, -21, 1, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Antennae
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-3, -25);
+    ctx.lineTo(-6, -32);
+    ctx.moveTo(3, -25);
+    ctx.lineTo(6, -32);
+    ctx.stroke();
+    
+    // Antennae tips
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.arc(-6, -32, 2, 0, Math.PI * 2);
+    ctx.arc(6, -32, 2, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Legs (simple)
+    ctx.strokeStyle = '#8B4513';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-8, 8);
+    ctx.lineTo(-12, 15);
+    ctx.moveTo(0, 10);
+    ctx.lineTo(0, 18);
+    ctx.moveTo(8, 8);
+    ctx.lineTo(12, 15);
+    ctx.stroke();
+    
+    ctx.restore();
+    
+    this.updateTrail();
+    this.drawTrail();
+  },
+  
+  update() {
+    // Handle movement input
+    this.vx = 0;
+    this.vy = 0;
+    
+    if (keys['ArrowUp'] || keys['KeyW']) this.vy = -MOVE_SPEED;
+    if (keys['ArrowDown'] || keys['KeyS']) this.vy = MOVE_SPEED;
+    if (keys['ArrowLeft'] || keys['KeyA']) this.vx = -MOVE_SPEED;
+    if (keys['ArrowRight'] || keys['KeyD']) this.vx = MOVE_SPEED;
+    
+    // Diagonal movement normalization
+    if (this.vx !== 0 && this.vy !== 0) {
+      this.vx *= 0.707; // 1/sqrt(2)
+      this.vy *= 0.707;
+    }
+    
+    // Update position
+    this.x += this.vx;
+    this.y += this.vy;
+    
+    // Keep bee within canvas bounds
+    if (this.x < 0) this.x = 0;
+    if (this.x > canvas.width - this.w) this.x = canvas.width - this.w;
+    if (this.y < 0) this.y = 0;
+    if (this.y > canvas.height - this.h) this.y = canvas.height - this.h;
+  },
+  
+  updateTrail() {
+    // Only add trail particles when moving
+    if (Math.abs(this.vx) > 0.1 || Math.abs(this.vy) > 0.1) {
+      this.trailParticles.push({
+        x: this.x + this.w/2,
+        y: this.y + this.h/2,
+        life: 12,
+        maxLife: 12
+      });
+    }
+    
+    this.trailParticles = this.trailParticles.filter(p => p.life > 0);
+    this.trailParticles.forEach(p => {
+      p.life--;
+      p.x -= 0.5;
+      p.y += Math.sin(p.life * 0.3) * 0.2;
+    });
+  },
+  
+  drawTrail() {
+    this.trailParticles.forEach(p => {
+      const alpha = p.life / p.maxLife;
+      ctx.fillStyle = `rgba(255, 215, 0, ${alpha * 0.3})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 1.5 * alpha, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+};
+
+function drawPlanters() {
+  PLANTERS.forEach(planter => {
+    // Planter pot (terracotta style)
+    ctx.fillStyle = '#CD853F';
+    ctx.strokeStyle = '#8B4513';
+    ctx.lineWidth = 2;
+    
+    // Main pot body
+    ctx.beginPath();
+    ctx.roundRect(planter.x, planter.y, planter.w, planter.h, 8);
+    ctx.fill();
+    ctx.stroke();
+    
+    // Pot rim
+    ctx.fillStyle = '#D2691E';
+    ctx.beginPath();
+    ctx.roundRect(planter.x - 5, planter.y - 8, planter.w + 10, 12, 6);
+    ctx.fill();
+    ctx.stroke();
+    
+    // Soil
+    ctx.fillStyle = '#8B4513';
+    ctx.beginPath();
+    ctx.roundRect(planter.x + 5, planter.y + 5, planter.w - 10, planter.h - 15, 4);
+    ctx.fill();
+    
+    // Decorative pattern on pot
+    ctx.strokeStyle = '#A0522D';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(planter.x + 10, planter.y + 20);
+    ctx.lineTo(planter.x + planter.w - 10, planter.y + 20);
+    ctx.moveTo(planter.x + 10, planter.y + 40);
+    ctx.lineTo(planter.x + planter.w - 10, planter.y + 40);
+    ctx.stroke();
+  });
+}
+
+// Load background image
+const backgroundImage = new Image();
+backgroundImage.src = 'forestgreenground.jpg';
+
+function drawBackground() {
+  // Draw the background image, scaled to fill the canvas
+  if (backgroundImage.complete) {
+    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+  } else {
+    // Fallback gradient while image loads
+    const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    skyGradient.addColorStop(0, '#6B8E3D');
+    skyGradient.addColorStop(0.7, '#4A5D23');
+    skyGradient.addColorStop(1, '#2F5233');
+    ctx.fillStyle = skyGradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+// Call setupAudio when the page loads
+document.addEventListener('DOMContentLoaded', setupAudio);
+
+// On DOMContentLoaded, ensure the button is hidden if present
+window.addEventListener('DOMContentLoaded', () => {
+  let soundBtn = document.getElementById('soundToggleBtn');
+  if (!soundBtn) {
+    soundBtn = document.createElement('button');
+    soundBtn.id = 'soundToggleBtn';
+    soundBtn.style.position = 'fixed';
+    soundBtn.style.top = '30px';
+    soundBtn.style.left = '30px';
+    soundBtn.style.zIndex = '1300';
+    soundBtn.style.background = '#fffbe6';
+    soundBtn.style.color = '#6B8E3D';
+    soundBtn.style.border = '2px dashed #bfa76a';
+    soundBtn.style.borderRadius = '8px';
+    soundBtn.style.padding = '0.5rem 1.2rem';
+    soundBtn.style.fontFamily = "'Playfair Display', serif";
+    soundBtn.style.fontSize = '1.1rem';
+    soundBtn.style.fontWeight = '700';
+    soundBtn.style.cursor = 'pointer';
+    soundBtn.style.boxShadow = '2px 4px 12px rgba(0,0,0,0.13)';
+    soundBtn.textContent = '🔊 Sound On';
+    soundBtn.style.display = 'none';
+    document.body.appendChild(soundBtn);
+    let isMuted = false;
+    soundBtn.addEventListener('click', () => {
+      isMuted = !isMuted;
+      bgMusic.muted = isMuted;
+      bloomSound.muted = isMuted;
+      soundBtn.textContent = isMuted ? '🔇 Sound Off' : '🔊 Sound On';
+    });
+  }
+  soundBtn.style.display = 'none';
+});
+</script>
+</body>
+</html> 

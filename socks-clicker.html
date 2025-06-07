@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ri Runner 🌲</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #0a1a0a;
+      --panel: rgba(10, 25, 15, 0.95);
+      --accent: #4a7a5a;
+      --accent-dark: #3a6a4a;
+      --txt: #e8ffe8;
+      --txt-bright: #ffffff;
+      --ground: #1a2f1a;
+      --sky: #0a1a0a;
+      --obstacle: #3a2c1c;
+      --menu-bg: rgba(5, 15, 10, 0.98);
+    }
+    * { box-sizing: border-box }
+    html, body { 
+      height: 100%; 
+      margin: 0; 
+      font-family: "Nunito", sans-serif; 
+      background: var(--bg); 
+      color: var(--txt);
+      font-weight: 600;
+    }
+    h1 { 
+      font-family: "Playfair Display", serif; 
+      font-size: 2.6rem; 
+      margin: 0; 
+      text-align: center; 
+      color: var(--txt-bright); 
+      letter-spacing: .5px;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    }
+
+    #shell {
+      max-width: 1400px;
+      margin: 4rem auto;
+      background: var(--panel);
+      border-radius: 16px;
+      padding: 2rem 1.5rem 3rem;
+      box-shadow: 0 0 40px rgba(0,0,0,.8);
+      border: 2px solid var(--accent);
+    }
+
+    #gameCanvas { 
+      display: block; 
+      margin: 2rem auto; 
+      border-radius: 12px; 
+      background: linear-gradient(var(--sky) 60%, var(--ground));
+      border: 3px solid var(--accent);
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    #score { 
+      font-family: "Playfair Display", serif; 
+      font-size: 2rem; 
+      text-align: center; 
+      margin-top: .5rem; 
+      color: var(--txt-bright);
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+      background: rgba(0,0,0,0.3);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      display: inline-block;
+    }
+
+    .menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--menu-bg);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+    }
+
+    .menu.hidden {
+      display: none;
+    }
+
+    .menu h2 {
+      font-family: "Playfair Display", serif;
+      font-size: 2.2rem;
+      color: var(--txt-bright);
+      margin: 0;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    }
+
+    .menu-content {
+      background: var(--panel);
+      padding: 2.5rem;
+      border-radius: 16px;
+      text-align: center;
+      max-width: 450px;
+      width: 90%;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    }
+
+    .menu-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .menu-btn {
+      background: var(--accent);
+      color: var(--txt-bright);
+      border: 2px solid var(--accent-dark);
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: "Nunito", sans-serif;
+      font-weight: 700;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+
+    .menu-btn:hover {
+      background: var(--accent-dark);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .character-select {
+      display: flex;
+      justify-content: center;
+      gap: 1.2rem;
+      margin: 1.5rem 0;
+    }
+
+    .character-btn {
+      position: relative;
+      min-width: 90px;
+      height: 90px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: var(--panel);
+      border: 3px solid var(--accent);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .character-btn:hover:not(.locked) {
+      transform: translateY(-4px);
+      border-color: var(--txt-bright);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+
+    .character-btn.selected {
+      border-color: var(--txt-bright);
+      background: var(--accent);
+      box-shadow: 0 0 15px rgba(255,255,255,0.3);
+    }
+
+    .character-btn .char-emoji {
+      font-size: 2.2rem;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+    }
+
+    .character-btn .char-image {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      border-radius: 6px;
+      margin-top: 2px;
+    }
+
+    .character-btn.locked {
+      opacity: 0.6;
+      cursor: not-allowed;
+      position: relative;
+      filter: grayscale(0.8);
+    }
+    
+    .character-btn.locked::before {
+      content: '🔒';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2.2rem;
+      z-index: 2;
+      text-shadow: 0 0 10px rgba(0,0,0,0.8);
+    }
+    
+    .character-btn.locked::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.4);
+      border-radius: 8px;
+      z-index: 1;
+    }
+    
+    .character-btn .char-name {
+      font-size: 1rem;
+      margin-top: 4px;
+      font-weight: 700;
+      color: var(--txt-bright);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    }
+    
+    .unlock-notification {
+      position: fixed;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: var(--txt-bright);
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      z-index: 1000;
+      animation: fadeInOut 3s ease-in-out;
+      box-shadow: 0 0 25px rgba(0,0,0,0.5);
+      border: 2px solid var(--accent-dark);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    }
+    
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translate(-50%, -30px); }
+      15% { opacity: 1; transform: translate(-50%, 0); }
+      85% { opacity: 1; transform: translate(-50%, 0); }
+      100% { opacity: 0; transform: translate(-50%, -30px); }
+    }
+
+    /* Additional text styling for better readability */
+    .menu-content p, .menu-content div {
+      color: var(--txt-bright);
+      font-weight: 600;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+    }
+
+    #finalScore, #highScore {
+      font-family: "Playfair Display", serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--txt-bright);
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+      margin: 0.5rem 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="shell">
+    <h1>Ri Runner 🌲</h1>
+    <div id="gameContainer">
+      <canvas id="gameCanvas" width="1200" height="400"></canvas>
+      <div id="score">0 m</div>
+    </div>
+  </div>
+
+  <div class="back-link" style="text-align: center; margin: 2rem auto; max-width: 800px;">
+    <a href="index.html" style="color: #4d7860; text-decoration: none; font-weight: 700; font-size: 1.1rem; font-family: 'Open Sans', sans-serif;">← Back to Forest Clearing</a>
+  </div>
+
+  <audio id="bgMusic" loop>
+    <source src="Clairo - Glory Of The Snow (Instrumental).mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="jumpSound" preload="auto">
+    <source src="cartoon-jump-6462.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Start Menu -->
+  <div id="startMenu" class="menu">
+    <div class="menu-content">
+      <h2>Ri Runner 🌲</h2>
+      <div class="character-select">
+        <button class="character-btn" data-char="👸" data-name="ri">
+          <img class="char-image" src="ri.png" alt="ri">
+          <span class="char-name">ri</span>
+        </button>
+        <button class="character-btn" data-char="🐱" data-name="Socks">
+          <img class="char-image" src="socks.png" alt="Socks" style="margin-top: 4px;">
+          <span class="char-name">Socks</span>
+        </button>
+        <button class="character-btn" data-char="🐰" data-name="Ping">
+          <img class="char-image" src="ping.png" alt="Ping">
+          <span class="char-name">Ping</span>
+        </button>
+      </div>
+      <div class="menu-buttons">
+        <button class="menu-btn" id="startGame">Start Game</button>
+        <a href="index.html" style="display: block; margin-top: 1rem; color: var(--txt-bright); text-decoration: none; font-weight: 600; font-size: 1.1rem;">← Back to Forest Clearing</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Death Menu -->
+  <div id="deathMenu" class="menu hidden">
+    <div class="menu-content">
+      <h2>Game Over</h2>
+      <div id="finalScore"></div>
+      <div id="highScore"></div>
+      <div class="character-select">
+        <button class="character-btn" data-char="🐱">Socks</button>
+        <button class="character-btn" data-char="🐰">Ping</button>
+        <button class="character-btn" data-char="👸">RIRI</button>
+      </div>
+      <div class="menu-buttons">
+        <button class="menu-btn" id="restartGame">Try Again</button>
+        <button class="menu-btn" id="backToMenu">Main Menu</button>
+        <a href="index.html" style="display: block; margin-top: 1rem; color: var(--txt-bright); text-decoration: none; font-weight: 600; font-size: 1.1rem;">← Back to Forest Clearing</a>
+      </div>
+    </div>
+  </div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx     = canvas.getContext('2d');
+const scoreEl = document.getElementById('score');
+
+const bgMusic = document.getElementById('bgMusic');
+const jumpSound = document.getElementById('jumpSound');
+const muteBtn = document.getElementById('muteBtn');
+
+bgMusic.volume = 0.3;
+jumpSound.volume = 0.5;
+let isMuted = false;
+
+const GROUND_Y   = 320;
+const GRAVITY    = 0.3;
+const JUMP_VEL   = -12;
+const FPS        = 60;
+let   speed      = 4;
+let   accel      = 0.00005;
+let   frameId;
+let   highScore  = localStorage.getItem('highScore') || 0;
+
+let gameStarted = false;
+let gameOver = false;
+
+const trees = [];
+const clouds = [];
+const birds = [];
+const TREE_COUNT = 8;
+const CLOUD_COUNT = 4;
+const BIRD_COUNT = 3;
+
+let unlockedCharacters = {
+  '👸': true,
+  '🐱': true,
+  '🐰': true
+};
+
+const characterImages = {
+  '🐱': new Image(),
+  '🐰': new Image(),
+  '👸': new Image()
+};
+
+characterImages['🐱'].onerror = function() {
+  console.log('Failed to load Socks image, using emoji fallback');
+};
+characterImages['👸'].onerror = function() {
+  console.log('Failed to load ri image, using emoji fallback');
+};
+characterImages['🐰'].onerror = function() {
+  console.log('Failed to load Ping image, using emoji fallback');
+};
+
+characterImages['🐱'].src = 'socks.png';
+characterImages['👸'].src = 'ri.png';
+characterImages['🐰'].src = 'ping.png';
+
+// Enhanced Tree class with better visuals
+class Tree {
+  constructor(x) {
+    this.x = x;
+    this.y = GROUND_Y - 60;
+    this.width = 30 + Math.random() * 25;
+    this.height = 60 + Math.random() * 50;
+    this.depth = Math.random(); // For layering effect
+  }
+  
+  draw() {
+    const alpha = 0.6 + this.depth * 0.4; // Depth-based opacity
+    
+    // Tree trunk with gradient
+    const trunkGradient = ctx.createLinearGradient(this.x, this.y, this.x + this.width * 0.3, this.y);
+    trunkGradient.addColorStop(0, `rgba(58, 90, 58, ${alpha})`);
+    trunkGradient.addColorStop(1, `rgba(78, 110, 78, ${alpha})`);
+    ctx.fillStyle = trunkGradient;
+    ctx.fillRect(this.x, this.y, this.width * 0.3, this.height);
+    
+    // Tree crown with multiple layers for depth
+    const topSize = this.width * (0.8 + this.depth * 0.4);
+    
+    // Dark base layer
+    ctx.fillStyle = `rgba(20, 50, 20, ${alpha * 0.8})`;
+    ctx.beginPath();
+    ctx.arc(this.x + this.width * 0.15, this.y - topSize * 0.2, topSize * 1.1, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Medium layer
+    ctx.fillStyle = `rgba(42, 74, 42, ${alpha})`;
+    ctx.beginPath();
+    ctx.arc(this.x + this.width * 0.15, this.y - topSize * 0.3, topSize, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Bright highlight layer
+    ctx.fillStyle = `rgba(58, 98, 58, ${alpha})`;
+    ctx.beginPath();
+    ctx.arc(this.x + this.width * 0.1, this.y - topSize * 0.4, topSize * 0.7, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Top highlight
+    ctx.fillStyle = `rgba(78, 128, 78, ${alpha * 0.6})`;
+    ctx.beginPath();
+    ctx.arc(this.x + this.width * 0.05, this.y - topSize * 0.5, topSize * 0.4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  update() {
+    this.x -= speed * (0.2 + this.depth * 0.3); // Depth-based movement
+    if (this.x + this.width < 0) {
+      this.x = canvas.width + Math.random() * 300;
+      this.y = GROUND_Y - 60;
+      this.width = 30 + Math.random() * 25;
+      this.height = 60 + Math.random() * 50;
+      this.depth = Math.random();
+    }
+  }
+}
+
+// Enhanced Cloud class with better atmosphere
+class Cloud {
+  constructor(x) {
+    this.x = x;
+    this.y = 40 + Math.random() * 80;
+    this.width = 80 + Math.random() * 60;
+    this.height = 30 + Math.random() * 25;
+    this.opacity = 0.3 + Math.random() * 0.4;
+    this.depth = Math.random();
+  }
+  
+  draw() {
+    const alpha = this.opacity * (0.5 + this.depth * 0.5);
+    
+    // Main cloud body with soft gradient
+    const gradient = ctx.createRadialGradient(
+      this.x + this.width * 0.5, this.y,
+      0,
+      this.x + this.width * 0.5, this.y,
+      this.width * 0.8
+    );
+    gradient.addColorStop(0, `rgba(80, 120, 80, ${alpha})`);
+    gradient.addColorStop(0.7, `rgba(60, 100, 60, ${alpha * 0.7})`);
+    gradient.addColorStop(1, `rgba(40, 80, 40, 0)`);
+    
+    ctx.fillStyle = gradient;
+    
+    // Draw multiple overlapping circles for natural cloud shape
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.width * 0.3, 0, Math.PI * 2);
+    ctx.arc(this.x + this.width * 0.3, this.y - this.height * 0.2, this.width * 0.4, 0, Math.PI * 2);
+    ctx.arc(this.x + this.width * 0.6, this.y, this.width * 0.35, 0, Math.PI * 2);
+    ctx.arc(this.x + this.width * 0.4, this.y + this.height * 0.3, this.width * 0.3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  update() {
+    this.x -= speed * (0.05 + this.depth * 0.1);
+    if (this.x + this.width < 0) {
+      this.x = canvas.width + Math.random() * 400;
+      this.y = 40 + Math.random() * 80;
+      this.width = 80 + Math.random() * 60;
+      this.depth = Math.random();
+    }
+  }
+}
+
+// Add distant mountains/hills for depth
+class Mountain {
+  constructor(x) {
+    this.x = x;
+    this.y = GROUND_Y - 20;
+    this.width = 150 + Math.random() * 100;
+    this.height = 80 + Math.random() * 60;
+    this.peaks = this.generatePeaks();
+  }
+  
+  generatePeaks() {
+    const peaks = [];
+    const peakCount = 3 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < peakCount; i++) {
+      peaks.push({
+        x: this.x + (this.width / peakCount) * i + Math.random() * 30,
+        height: this.height * (0.7 + Math.random() * 0.6)
+      });
+    }
+    return peaks;
+  }
+  
+  draw() {
+    // Mountain silhouette
+    const mountainGradient = ctx.createLinearGradient(0, this.y - this.height, 0, this.y);
+    mountainGradient.addColorStop(0, 'rgba(15, 35, 15, 0.6)');
+    mountainGradient.addColorStop(1, 'rgba(25, 45, 25, 0.8)');
+    ctx.fillStyle = mountainGradient;
+    
+    ctx.beginPath();
+    ctx.moveTo(this.x, this.y);
+    
+    this.peaks.forEach((peak, i) => {
+      if (i === 0) {
+        ctx.lineTo(peak.x, this.y - peak.height);
+      } else {
+        const prevPeak = this.peaks[i - 1];
+        const midX = (prevPeak.x + peak.x) / 2;
+        const midY = this.y - Math.min(prevPeak.height, peak.height) * 0.7;
+        ctx.quadraticCurveTo(midX, midY, peak.x, this.y - peak.height);
+      }
+    });
+    
+    ctx.lineTo(this.x + this.width, this.y);
+    ctx.fill();
+  }
+  
+  update() {
+    this.x -= speed * 0.1; // Very slow movement for distance effect
+    if (this.x + this.width < 0) {
+      this.x = canvas.width + Math.random() * 200;
+      this.peaks = this.generatePeaks();
+    }
+  }
+}
+
+// Enhanced Bird class
+class Bird {
+  constructor(x) {
+    this.x = x;
+    this.y = 60 + Math.random() * 120;
+    this.size = 12 + Math.random() * 8;
+    this.wingAngle = 0;
+    this.wingSpeed = 0.15 + Math.random() * 0.1;
+    this.bobOffset = Math.random() * Math.PI * 2;
+  }
+  
+  draw() {
+    ctx.save();
+    
+    // Add slight bobbing motion
+    const bobY = Math.sin(this.bobOffset + this.wingAngle * 0.5) * 2;
+    ctx.translate(this.x, this.y + bobY);
+    
+    // Bird body with gradient
+    const bodyGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.size);
+    bodyGradient.addColorStop(0, 'rgba(40, 40, 40, 0.8)');
+    bodyGradient.addColorStop(1, 'rgba(20, 20, 20, 0.6)');
+    ctx.fillStyle = bodyGradient;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, this.size, this.size * 0.6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Animated wings with smooth motion
+    const wingOffset = Math.sin(this.wingAngle) * 4;
+    const wingSpread = Math.abs(Math.sin(this.wingAngle)) * 0.3 + 0.7;
+    
+    ctx.fillStyle = 'rgba(30, 30, 30, 0.7)';
+    ctx.beginPath();
+    ctx.ellipse(-this.size * wingSpread, wingOffset, this.size * 0.6, this.size * 0.4, 0, 0, Math.PI * 2);
+    ctx.ellipse(this.size * wingSpread, wingOffset, this.size * 0.6, this.size * 0.4, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.restore();
+  }
+  
+  update() {
+    this.x -= speed * 0.5;
+    this.wingAngle += this.wingSpeed;
+    if (this.x + this.size < 0) {
+      this.x = canvas.width + Math.random() * 600;
+      this.y = 60 + Math.random() * 120;
+    }
+  }
+}
+
+// Add floating particles for atmosphere
+class Particle {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.size = 1 + Math.random() * 2;
+    this.speed = 0.2 + Math.random() * 0.5;
+    this.opacity = 0.1 + Math.random() * 0.3;
+    this.drift = Math.random() * 0.02 - 0.01;
+  }
+  
+  draw() {
+    ctx.fillStyle = `rgba(120, 160, 120, ${this.opacity})`;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  update() {
+    this.x -= this.speed;
+    this.y += this.drift;
+    if (this.x < 0) {
+      this.x = canvas.width;
+      this.y = Math.random() * canvas.height;
+    }
+    if (this.y < 0 || this.y > canvas.height) {
+      this.y = Math.random() * canvas.height;
+    }
+  }
+}
+
+// Enhanced Hill class for better tree grounding
+class Hill {
+  constructor(x) {
+    this.x = x;
+    this.y = GROUND_Y;
+    this.width = 150 + Math.random() * 200;
+    this.height = 30 + Math.random() * 60; // Taller hills
+    this.curve = Math.random() * 0.7 + 0.4; // More pronounced curves
+    this.slope = Math.random() * 0.3 + 0.2;
+  }
+  
+  draw() {
+    // Hill gradient for better depth
+    const hillGradient = ctx.createLinearGradient(0, this.y - this.height, 0, this.y + 10);
+    hillGradient.addColorStop(0, 'rgba(55, 85, 55, 0.8)');
+    hillGradient.addColorStop(0.5, 'rgba(45, 75, 45, 0.9)');
+    hillGradient.addColorStop(0.8, 'rgba(35, 65, 35, 0.95)');
+    hillGradient.addColorStop(1, 'rgba(25, 55, 25, 1)');
+    ctx.fillStyle = hillGradient;
+    
+    // Draw more natural rolling hill shape
+    ctx.beginPath();
+    ctx.moveTo(this.x, this.y);
+    
+    // Create smoother, more varied hill curves
+    const points = 12;
+    for (let i = 0; i <= points; i++) {
+      const t = i / points;
+      const x = this.x + this.width * t;
+      
+      // Create multiple wave patterns for natural hills
+      const mainCurve = Math.sin(t * Math.PI) * this.curve;
+      const smallVariation = Math.sin(t * Math.PI * 3) * 0.1;
+      const y = this.y - this.height * (mainCurve + smallVariation);
+      
+      if (i === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        const prevT = (i - 1) / points;
+        const prevX = this.x + this.width * prevT;
+        const cp1x = prevX + this.width / points * 0.4;
+        const cp1y = y - this.height * 0.05;
+        const cp2x = x - this.width / points * 0.4;
+        const cp2y = y - this.height * 0.05;
+        
+        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y);
+      }
+    }
+    
+    // Complete the hill shape
+    ctx.lineTo(this.x + this.width, this.y + 15);
+    ctx.lineTo(this.x, this.y + 15);
+    ctx.fill();
+    
+    // Add hill texture with small bushes and rocks
+    for (let i = 0; i < this.width; i += 25) {
+      if (Math.random() < 0.4) {
+        const bushX = this.x + i;
+        const t = i / this.width;
+        const mainCurve = Math.sin(t * Math.PI) * this.curve;
+        const bushY = this.y - this.height * mainCurve - 5;
+        
+        // Small bush on hill
+        ctx.fillStyle = 'rgba(30, 60, 30, 0.7)';
+        ctx.beginPath();
+        ctx.arc(bushX, bushY, 3 + Math.random() * 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+  
+  update() {
+    this.x -= speed * 0.18;
+    if (this.x + this.width < 0) {
+      this.x = canvas.width + Math.random() * 150;
+      this.width = 150 + Math.random() * 200;
+      this.height = 30 + Math.random() * 60;
+      this.curve = Math.random() * 0.7 + 0.4;
+    }
+  }
+}
+
+// Beautiful Star class for night sky
+class Star {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height * 0.35; // Constrained to upper 35% to stay above landscape
+    this.size = Math.random() * 2 + 0.5;
+    this.brightness = Math.random() * 0.8 + 0.2;
+    this.twinkleSpeed = Math.random() * 0.02 + 0.01;
+    this.twinklePhase = Math.random() * Math.PI * 2;
+    this.isShootingStar = Math.random() < 0.02; // 2% chance
+    this.shootingSpeed = this.isShootingStar ? 2 + Math.random() * 3 : 0;
+    this.trail = [];
+  }
+  
+  draw() {
+    if (this.isShootingStar) {
+      // Draw shooting star trail
+      ctx.strokeStyle = `rgba(255, 255, 255, ${this.brightness * 0.3})`;
+      ctx.lineWidth = this.size;
+      ctx.beginPath();
+      if (this.trail.length > 1) {
+        ctx.moveTo(this.trail[0].x, this.trail[0].y);
+        for (let i = 1; i < this.trail.length; i++) {
+          const alpha = i / this.trail.length;
+          ctx.globalAlpha = alpha * this.brightness * 0.5;
+          ctx.lineTo(this.trail[i].x, this.trail[i].y);
+        }
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+    
+    // Calculate twinkling effect
+    const twinkle = Math.sin(this.twinklePhase) * 0.3 + 0.7;
+    const currentBrightness = this.brightness * twinkle;
+    
+    // Star glow effect
+    const glowGradient = ctx.createRadialGradient(
+      this.x, this.y, 0,
+      this.x, this.y, this.size * 3
+    );
+    glowGradient.addColorStop(0, `rgba(255, 255, 255, ${currentBrightness})`);
+    glowGradient.addColorStop(0.5, `rgba(200, 220, 255, ${currentBrightness * 0.3})`);
+    glowGradient.addColorStop(1, 'rgba(150, 180, 255, 0)');
+    
+    ctx.fillStyle = glowGradient;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Main star body
+    ctx.fillStyle = `rgba(255, 255, 255, ${currentBrightness})`;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Star sparkle effect for brighter stars
+    if (this.size > 1.5) {
+      ctx.strokeStyle = `rgba(255, 255, 255, ${currentBrightness * 0.8})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(this.x - this.size * 2, this.y);
+      ctx.lineTo(this.x + this.size * 2, this.y);
+      ctx.moveTo(this.x, this.y - this.size * 2);
+      ctx.lineTo(this.x, this.y + this.size * 2);
+      ctx.stroke();
+    }
+  }
+  
+  update() {
+    this.twinklePhase += this.twinkleSpeed;
+    
+    if (this.isShootingStar) {
+      // Update shooting star
+      this.trail.push({x: this.x, y: this.y});
+      if (this.trail.length > 8) {
+        this.trail.shift();
+      }
+      
+      this.x += this.shootingSpeed;
+      this.y += this.shootingSpeed * 0.3;
+      
+      // Reset shooting star when it goes off screen
+      if (this.x > canvas.width + 50) {
+        this.x = -50;
+        this.y = Math.random() * canvas.height * 0.3; // Keep in upper sky when resetting
+        this.trail = [];
+      }
+    } else {
+      // Gentle parallax movement for regular stars
+      this.x -= speed * 0.01;
+      if (this.x < -10) {
+        this.x = canvas.width + 10;
+        this.y = Math.random() * canvas.height * 0.35; // Keep in upper sky when resetting
+      }
+    }
+  }
+}
+
+// Add ground cover for better tree grounding
+class GroundCover {
+  constructor(x) {
+    this.x = x;
+    this.y = GROUND_Y + 64; // At ground level
+    this.width = 40 + Math.random() * 30;
+    this.type = Math.random() < 0.5 ? 'bush' : 'grass';
+  }
+  
+  draw() {
+    if (this.type === 'bush') {
+      // Small ground bushes
+      ctx.fillStyle = 'rgba(40, 70, 40, 0.8)';
+      for (let i = 0; i < 3; i++) {
+        const size = 8 + Math.random() * 6;
+        const offsetX = (i - 1) * 8;
+        ctx.beginPath();
+        ctx.arc(this.x + offsetX, this.y - size/2, size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    } else {
+      // Tall grass clumps
+      ctx.fillStyle = 'rgba(60, 90, 60, 0.7)';
+      for (let i = 0; i < 8; i++) {
+        const grassHeight = 8 + Math.random() * 12;
+        const offsetX = i * 4;
+        ctx.fillRect(this.x + offsetX, this.y - grassHeight, 2, grassHeight);
+      }
+    }
+  }
+  
+  update() {
+    this.x -= speed * 0.4;
+    if (this.x + this.width < 0) {
+      this.x = canvas.width + Math.random() * 100;
+      this.type = Math.random() < 0.5 ? 'bush' : 'grass';
+    }
+  }
+}
+
+// Modified player character
+const player = {
+  x: 120,
+  y: GROUND_Y,
+  w: 64,
+  h: 64,
+  vy: 0,
+  vx: 0,
+  jumping: false,
+  originalX: 120,
+  character: '🐱',
+  draw() {
+    ctx.save();
+    ctx.translate(this.x + this.w/2, this.y + this.h/2);
+    
+    if (this.character === '🐱') {
+      const img = characterImages['🐱'];
+      if (img.complete && img.naturalWidth !== 0) {
+        const imageSize = this.w * 1.5;
+        ctx.drawImage(img, -imageSize/2, -imageSize/2, imageSize, imageSize);
+      } else {
+        ctx.font = '64px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🐱', 0, 0);
+      }
+    } else if (this.character === '👸') {
+      const img = characterImages['👸'];
+      if (img.complete && img.naturalWidth !== 0) {
+        const imageSize = this.w * 1.5;
+        ctx.drawImage(img, -imageSize/2, -imageSize/2, imageSize, imageSize);
+      } else {
+        ctx.font = '64px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('👸', 0, 0);
+      }
+    } else if (this.character === '🐰') {
+      const img = characterImages['🐰'];
+      if (img.complete && img.naturalWidth !== 0) {
+        const imageSize = this.w * 1.5;
+        ctx.drawImage(img, -imageSize/2, -imageSize/2, imageSize, imageSize);
+      } else {
+        ctx.font = '64px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🐰', 0, 0);
+      }
+    } else {
+      ctx.font = '64px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(this.character, 0, 0);
+    }
+    
+    ctx.restore();
+  },
+  update() {
+    if(this.jumping) {
+      this.vy += GRAVITY;
+      this.y += this.vy;
+      
+      if (this.vx > 0) {
+        this.x += this.vx;
+        this.vx *= 0.9;
+        
+        if (this.x > this.originalX + 40) {
+          this.x = this.originalX + 40;
+          this.vx = 0;
+        }
+      }
+      
+      if(this.y >= GROUND_Y) {
+        this.y = GROUND_Y;
+        this.jumping = false;
+        this.vy = 0;
+        this.vx = 0;
+        this.x = this.originalX;
+      }
+    }
+  },
+  jump() {
+    if(!this.jumping) {
+      this.vy = JUMP_VEL;
+      this.vx = speed * 0.5;
+      this.jumping = true;
+      
+      jumpSound.currentTime = 0;
+      jumpSound.play().catch(() => {});
+    }
+  }
+};
+
+// Modified obstacle types
+class Obstacle {
+  constructor(type) {
+    this.type = type;
+    this.x = canvas.width;
+    this.y = GROUND_Y;
+    
+    switch(type) {
+      case 'stump':
+        this.w = 50 + Math.random() * 30;    // larger obstacles
+        this.h = 60 + Math.random() * 40;    // larger obstacles
+        this.y = GROUND_Y + (player.h - this.h);
+        break;
+      case 'log':
+        this.w = 80 + Math.random() * 40;    // larger obstacles
+        this.h = 30 + Math.random() * 20;    // larger obstacles
+        this.y = GROUND_Y + (player.h - this.h);
+        break;
+      case 'rock':
+        this.w = 40 + Math.random() * 30;    // larger obstacles
+        this.h = 30 + Math.random() * 20;    // larger obstacles
+        this.y = GROUND_Y + (player.h - this.h);
+        break;
+      case 'bush':
+        this.w = 60 + Math.random() * 40;    // larger obstacles
+        this.h = 40 + Math.random() * 30;    // larger obstacles
+        this.y = GROUND_Y + (player.h - this.h);
+        break;
+    }
+  }
+  draw() {
+    // Add animation timer for dynamic effects
+    const time = Date.now() * 0.005;
+    
+    switch(this.type) {
+      case 'stump':
+        // Enchanted glowing stump
+        const stumpGlow = Math.sin(time) * 0.3 + 0.7;
+        
+        // Add magical glow around stump
+        const stumpAura = ctx.createRadialGradient(
+          this.x + this.w/2, this.y + this.h/2, 0,
+          this.x + this.w/2, this.y + this.h/2, this.w
+        );
+        stumpAura.addColorStop(0, `rgba(100, 200, 100, ${stumpGlow * 0.2})`);
+        stumpAura.addColorStop(1, 'rgba(50, 150, 50, 0)');
+        ctx.fillStyle = stumpAura;
+        ctx.fillRect(this.x - this.w/2, this.y - this.h/2, this.w * 2, this.h * 2);
+        
+        // Enhanced stump with more realistic wood texture
+        const stumpGradient = ctx.createLinearGradient(this.x, this.y, this.x + this.w, this.y);
+        stumpGradient.addColorStop(0, '#2d1a0a');
+        stumpGradient.addColorStop(0.5, '#3d2a1a');
+        stumpGradient.addColorStop(1, '#2d1a0a');
+        ctx.fillStyle = stumpGradient;
+        
+        // Draw main stump body with slight curve
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y + this.h);
+        ctx.quadraticCurveTo(
+          this.x + this.w/2, this.y + this.h * 0.8,
+          this.x + this.w, this.y + this.h
+        );
+        ctx.lineTo(this.x + this.w, this.y);
+        ctx.lineTo(this.x, this.y);
+        ctx.fill();
+        
+        // Add glowing mushrooms on stump
+        for (let i = 0; i < 3; i++) {
+          const mushroomX = this.x + this.w * (0.2 + i * 0.3);
+          const mushroomY = this.y + this.h * 0.3;
+          const mushroomGlow = Math.sin(time + i) * 0.4 + 0.6;
+          
+          // Mushroom glow
+          const mushroomAura = ctx.createRadialGradient(mushroomX, mushroomY, 0, mushroomX, mushroomY, 8);
+          mushroomAura.addColorStop(0, `rgba(255, 100, 150, ${mushroomGlow * 0.8})`);
+          mushroomAura.addColorStop(1, 'rgba(200, 50, 100, 0)');
+          ctx.fillStyle = mushroomAura;
+          ctx.beginPath();
+          ctx.arc(mushroomX, mushroomY, 8, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // Mushroom body
+          ctx.fillStyle = `rgba(255, 150, 200, ${mushroomGlow})`;
+          ctx.beginPath();
+          ctx.arc(mushroomX, mushroomY, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        break;
+      
+      case 'log':
+        // Crystallized floating log
+        const logFloat = Math.sin(time * 2) * 3;
+        const logGlow = Math.sin(time * 1.5) * 0.4 + 0.6;
+        
+        // Crystal aura
+        const crystalAura = ctx.createRadialGradient(
+          this.x + this.w/2, this.y + this.h/2 + logFloat, 0,
+          this.x + this.w/2, this.y + this.h/2 + logFloat, this.w * 1.5
+        );
+        crystalAura.addColorStop(0, `rgba(100, 200, 255, ${logGlow * 0.3})`);
+        crystalAura.addColorStop(0.7, `rgba(50, 150, 255, ${logGlow * 0.1})`);
+        crystalAura.addColorStop(1, 'rgba(0, 100, 200, 0)');
+        ctx.fillStyle = crystalAura;
+        ctx.fillRect(this.x - this.w/2, this.y - this.h, this.w * 2, this.h * 3);
+        
+        // Floating log with crystal veins
+        const logGradient = ctx.createLinearGradient(this.x, this.y + logFloat, this.x + this.w, this.y + logFloat);
+        logGradient.addColorStop(0, '#3a2c1c');
+        logGradient.addColorStop(0.5, '#4a3c2c');
+        logGradient.addColorStop(1, '#3a2c1c');
+        ctx.fillStyle = logGradient;
+        
+        // Draw floating log
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y + this.h * 0.8 + logFloat);
+        ctx.quadraticCurveTo(
+          this.x + this.w/2, this.y + this.h + logFloat,
+          this.x + this.w, this.y + this.h * 0.8 + logFloat
+        );
+        ctx.lineTo(this.x + this.w, this.y + this.h * 0.2 + logFloat);
+        ctx.quadraticCurveTo(
+          this.x + this.w/2, this.y + logFloat,
+          this.x, this.y + this.h * 0.2 + logFloat
+        );
+        ctx.fill();
+        
+        // Crystal veins
+        ctx.strokeStyle = `rgba(150, 220, 255, ${logGlow})`;
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 4; i++) {
+          const veinX = this.x + (this.w / 4) * i;
+          ctx.beginPath();
+          ctx.moveTo(veinX, this.y + logFloat);
+          ctx.lineTo(veinX + Math.sin(time + i) * 10, this.y + this.h + logFloat);
+          ctx.stroke();
+        }
+        break;
+      
+      case 'rock':
+        // Meteor rock with fire effects
+        const fireIntensity = Math.sin(time * 3) * 0.5 + 0.5;
+        
+        // Fire aura
+        const fireGradient = ctx.createRadialGradient(
+          this.x + this.w/2, this.y, 0,
+          this.x + this.w/2, this.y, this.w * 1.2
+        );
+        fireGradient.addColorStop(0, `rgba(255, 100, 0, ${fireIntensity * 0.8})`);
+        fireGradient.addColorStop(0.5, `rgba(255, 150, 50, ${fireIntensity * 0.4})`);
+        fireGradient.addColorStop(1, 'rgba(200, 50, 0, 0)');
+        ctx.fillStyle = fireGradient;
+        ctx.fillRect(this.x - this.w/2, this.y - this.h, this.w * 2, this.h * 2);
+        
+        // Hot rock with lava cracks
+        const rockGradient = ctx.createRadialGradient(
+          this.x + this.w/3, this.y + this.h/3,
+          0,
+          this.x + this.w/2, this.y + this.h/2,
+          this.w/2
+        );
+        rockGradient.addColorStop(0, '#6a4a4a');
+        rockGradient.addColorStop(0.5, '#4a3a3a');
+        rockGradient.addColorStop(1, '#2a2a2a');
+        ctx.fillStyle = rockGradient;
+        
+        // Draw main rock shape with irregular edges
+        ctx.beginPath();
+        const points = 8;
+        for (let i = 0; i < points; i++) {
+          const angle = (i / points) * Math.PI * 2;
+          const radius = this.w/2 * (0.8 + Math.sin(time + i) * 0.2);
+          const x = this.x + this.w/2 + Math.cos(angle) * radius;
+          const y = this.y + this.h/2 + Math.sin(angle) * radius;
+          if (i === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+        }
+        ctx.closePath();
+        ctx.fill();
+        
+        // Glowing lava cracks
+        ctx.strokeStyle = `rgba(255, 100, 0, ${fireIntensity})`;
+        ctx.lineWidth = 3;
+        for (let i = 0; i < 5; i++) {
+          const crackStart = {
+            x: this.x + Math.random() * this.w,
+            y: this.y + Math.random() * this.h
+          };
+          const crackEnd = {
+            x: crackStart.x + Math.sin(time + i) * 15,
+            y: crackStart.y + Math.cos(time + i) * 15
+          };
+          
+          ctx.beginPath();
+          ctx.moveTo(crackStart.x, crackStart.y);
+          ctx.lineTo(crackEnd.x, crackEnd.y);
+          ctx.stroke();
+        }
+        break;
+      
+      case 'bush':
+        // Magical swaying bush with fairy lights
+        const swayOffset = Math.sin(time) * 5;
+        const magicGlow = Math.sin(time * 2) * 0.3 + 0.7;
+        
+        // Magical aura
+        const bushAura = ctx.createRadialGradient(
+          this.x + this.w/2, this.y + this.h/2, 0,
+          this.x + this.w/2, this.y + this.h/2, this.w
+        );
+        bushAura.addColorStop(0, `rgba(150, 255, 150, ${magicGlow * 0.3})`);
+        bushAura.addColorStop(0.7, `rgba(100, 200, 100, ${magicGlow * 0.1})`);
+        bushAura.addColorStop(1, 'rgba(50, 150, 50, 0)');
+        ctx.fillStyle = bushAura;
+        ctx.fillRect(this.x - this.w/2, this.y - this.h/2, this.w * 2, this.h * 2);
+        
+        // Draw swaying bush with more natural shape
+        for (let i = 0; i < 5; i++) {
+          const bushGradient = ctx.createRadialGradient(
+            this.x + this.w/2, this.y + this.h/2,
+            0,
+            this.x + this.w/2, this.y + this.h/2,
+            this.w/2 - i*5
+          );
+          bushGradient.addColorStop(0, '#2a4a2a');
+          bushGradient.addColorStop(0.5, '#1a3a1a');
+          bushGradient.addColorStop(1, '#0a2a0a');
+          
+          ctx.fillStyle = bushGradient;
+          
+          // Draw multiple overlapping circles with sway
+          for (let j = 0; j < 3; j++) {
+            const offsetX = Math.sin(i + j + time) * 10 + swayOffset;
+            const offsetY = Math.cos(i + j + time) * 5;
+            const size = this.w/2 - i*5;
+            
+            ctx.beginPath();
+            ctx.arc(
+              this.x + this.w/2 + offsetX,
+              this.y + this.h/2 + offsetY,
+              size,
+              0,
+              Math.PI * 2
+            );
+            ctx.fill();
+          }
+        }
+        
+        // Fairy lights in the bush
+        for (let i = 0; i < 6; i++) {
+          const lightX = this.x + this.w * (0.2 + Math.random() * 0.6);
+          const lightY = this.y + this.h * (0.2 + Math.random() * 0.6);
+          const lightGlow = Math.sin(time * 3 + i) * 0.5 + 0.5;
+          const colors = ['255,255,100', '100,255,255', '255,100,255', '100,255,100'];
+          const color = colors[i % colors.length];
+          
+          // Light glow
+          const lightAura = ctx.createRadialGradient(lightX, lightY, 0, lightX, lightY, 8);
+          lightAura.addColorStop(0, `rgba(${color}, ${lightGlow * 0.8})`);
+          lightAura.addColorStop(1, `rgba(${color}, 0)`);
+          ctx.fillStyle = lightAura;
+          ctx.beginPath();
+          ctx.arc(lightX, lightY, 8, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // Light core
+          ctx.fillStyle = `rgba(${color}, ${lightGlow})`;
+          ctx.beginPath();
+          ctx.arc(lightX, lightY, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        break;
+    }
+  }
+
+  update() {
+    this.x -= speed;
+  }
+
+  get offscreen() {
+    return this.x + this.w < 0;
+  }
+}
+
+// Modified obstacle spawning
+const obstacles = [];
+let spawnTimer = 0;
+const OBSTACLE_TYPES = ['stump', 'log', 'rock', 'bush'];
+let lastObstacleType = null;
+
+function getSpawnInterval() {
+  const baseInterval = 2000 + Math.random() * 2000;
+  const scoreFactor = Math.max(0.3, 1 - (dist / 5000));
+  return baseInterval * scoreFactor;
+}
+
+function spawnObstacle() {
+  const spawnMultiple = Math.random() < (dist / 10000);
+  
+  let availableTypes = OBSTACLE_TYPES.filter(type => type !== lastObstacleType);
+  let type = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+  lastObstacleType = type;
+  
+  const obstacle = new Obstacle(type);
+  addMinorVariations(obstacle);
+  obstacles.push(obstacle);
+  
+  if (spawnMultiple && Math.random() < 0.3) {
+    const spacing = 300 + Math.random() * 200;
+    let secondType = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+    let secondObstacle = new Obstacle(secondType);
+    secondObstacle.x = canvas.width + spacing;
+    addMinorVariations(secondObstacle);
+    obstacles.push(secondObstacle);
+  }
+}
+
+function addMinorVariations(obstacle) {
+  const sizeVariation = 0.9 + Math.random() * 0.2;
+  obstacle.w *= sizeVariation;
+  obstacle.h *= sizeVariation;
+  
+  const heightOffset = Math.random() * 10 - 5;
+  obstacle.y += heightOffset;
+  obstacle.y = Math.max(GROUND_Y + player.h - obstacle.h, obstacle.y);
+}
+
+// score
+let dist = 0;
+function updateScore(dt) {
+  dist += (speed * dt) / 400;    // keep current scoring rate
+  const score = Math.floor(dist);
+  scoreEl.textContent = score + ' m';
+}
+
+// collision
+function hit(a,b){
+  return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y;
+}
+
+// game loop
+let last=performance.now();
+function loop(now){
+  const dt = now-last; last=now;
+
+  // Create beautiful night sky gradient
+  const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  bgGradient.addColorStop(0, '#0a1420');    // Deep night blue at top
+  bgGradient.addColorStop(0.3, '#0f1f2f');  // Darker blue
+  bgGradient.addColorStop(0.6, '#1a2a3a');  // Horizon glow
+  bgGradient.addColorStop(0.8, '#0f2f1f');  // Forest transition
+  bgGradient.addColorStop(1, '#0a2a1a');     // Dark ground
+  ctx.fillStyle = bgGradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Add subtle moon glow in the sky
+  const moonGradient = ctx.createRadialGradient(
+    canvas.width * 0.8, canvas.height * 0.2,
+    0,
+    canvas.width * 0.8, canvas.height * 0.2,
+    canvas.width * 0.3
+  );
+  moonGradient.addColorStop(0, 'rgba(240, 240, 255, 0.05)');
+  moonGradient.addColorStop(0.5, 'rgba(200, 220, 255, 0.02)');
+  moonGradient.addColorStop(1, 'rgba(150, 180, 255, 0)');
+  ctx.fillStyle = moonGradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Draw twinkling stars
+  stars.forEach(star => {
+    star.update();
+    star.draw();
+  });
+
+  // Draw background elements in depth order
+  mountains.forEach(mountain => {
+    mountain.update();
+    mountain.draw();
+  });
+
+  clouds.forEach(cloud => {
+    cloud.update();
+    cloud.draw();
+  });
+  
+  // Draw simple stagnant landscape base
+  const landscapeHeight = 120;
+  const landscapeY = GROUND_Y - 10;
+  
+  // Solid landscape foundation
+  const landscapeGradient = ctx.createLinearGradient(0, landscapeY - landscapeHeight, 0, landscapeY + 40);
+  landscapeGradient.addColorStop(0, '#2a5a3a');
+  landscapeGradient.addColorStop(0.3, '#3a6a4a');
+  landscapeGradient.addColorStop(0.7, '#4a7a5a');
+  landscapeGradient.addColorStop(1, '#1a3a2a');
+  
+  ctx.fillStyle = landscapeGradient;
+  ctx.fillRect(0, landscapeY - landscapeHeight, canvas.width, landscapeHeight + 40);
+  
+  // Add some basic texture to the landscape
+  ctx.fillStyle = 'rgba(58, 98, 58, 0.3)';
+  for (let i = 0; i < canvas.width; i += 20) {
+    const textureHeight = 10 + Math.random() * 15;
+    ctx.fillRect(i, landscapeY - textureHeight, 15, textureHeight);
+  }
+  
+  // Draw hills before trees to ground them
+  hills.forEach(hill => {
+    hill.update();
+    hill.draw();
+  });
+  
+  particles.forEach(particle => {
+    particle.update();
+    particle.draw();
+  });
+
+  birds.forEach(bird => {
+    bird.update();
+    bird.draw();
+  });
+
+  trees.forEach(tree => {
+    tree.update();
+    tree.draw();
+  });
+  
+  // Draw ground cover after trees for layering
+  groundCover.forEach(cover => {
+    cover.update();
+    cover.draw();
+  });
+
+  // Enhanced ground with texture and depth
+  const groundGradient = ctx.createLinearGradient(0, GROUND_Y + player.h, 0, GROUND_Y + player.h + 20);
+  groundGradient.addColorStop(0, '#3a7a4a');
+  groundGradient.addColorStop(0.5, '#2a5a3a');
+  groundGradient.addColorStop(1, '#1a3a2a');
+  ctx.fillStyle = groundGradient;
+  ctx.fillRect(0, GROUND_Y + player.h, canvas.width, 20);
+  
+  // Detailed grass with varying heights and colors
+  for (let i = 0; i < canvas.width; i += 8) {
+    const grassHeight = 2 + Math.random() * 6;
+    const grassShade = Math.random() * 40 + 80;
+    ctx.fillStyle = `rgba(${grassShade - 20}, ${grassShade + 20}, ${grassShade - 10}, 0.8)`;
+    ctx.fillRect(i + Math.random() * 4, GROUND_Y + player.h - grassHeight, 2, grassHeight);
+  }
+  
+  // Add some small flowers/details
+  for (let i = 0; i < canvas.width; i += 50) {
+    if (Math.random() < 0.3) {
+      ctx.fillStyle = `rgba(${100 + Math.random() * 50}, ${80 + Math.random() * 40}, ${120 + Math.random() * 30}, 0.6)`;
+      ctx.beginPath();
+      ctx.arc(i + Math.random() * 20, GROUND_Y + player.h - 2, 1 + Math.random(), 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  // player
+  player.update(); player.draw();
+
+  // obstacles
+  spawnTimer += dt;
+  if(spawnTimer > getSpawnInterval()) {
+    spawnObstacle();
+    spawnTimer = 0;
+  }
+  obstacles.forEach(o => { o.update(); o.draw(); });
+  // remove off-screen
+  while(obstacles.length && obstacles[0].offscreen) obstacles.shift();
+
+  // collision check
+  for(const o of obstacles){
+    if(hit(player,o)) return showDeathMenu();
+  }
+
+  // speed ramp + score
+  speed += (accel*dt)*(1 + Math.floor(dist)/2000);
+  updateScore(dt);
+
+  frameId = requestAnimationFrame(loop);
+}
+
+function start(){
+  speed = 4;
+  dist = 0;
+  obstacles.length = 0;
+  spawnTimer = 0;
+  player.y = GROUND_Y;
+  player.vy = 0;
+  player.jumping = false;
+  gameStarted = true;
+  gameOver = false;
+  initBackground();
+  document.getElementById('startMenu').classList.add('hidden');
+  document.getElementById('deathMenu').classList.add('hidden');
+  // Show sound button
+  let soundBtn = document.getElementById('soundToggleBtn');
+  if (!soundBtn) {
+    soundBtn = document.createElement('button');
+    soundBtn.id = 'soundToggleBtn';
+    soundBtn.style.position = 'fixed';
+    soundBtn.style.top = '30px';
+    soundBtn.style.left = '30px';
+    soundBtn.style.zIndex = '1300';
+    soundBtn.style.background = '#eaf5ea';
+    soundBtn.style.color = '#355c4d';
+    soundBtn.style.border = '2px dashed #4a7a5a';
+    soundBtn.style.borderRadius = '8px';
+    soundBtn.style.padding = '0.5rem 1.2rem';
+    soundBtn.style.fontFamily = "'Playfair Display', serif";
+    soundBtn.style.fontSize = '1.1rem';
+    soundBtn.style.fontWeight = '700';
+    soundBtn.style.cursor = 'pointer';
+    soundBtn.style.boxShadow = '2px 4px 12px rgba(0,0,0,0.13)';
+    soundBtn.textContent = '🔊 Sound On';
+    soundBtn.style.display = 'none';
+    document.body.appendChild(soundBtn);
+    let isMuted = false;
+    soundBtn.addEventListener('click', () => {
+      isMuted = !isMuted;
+      bgMusic.muted = isMuted;
+      jumpSound.muted = isMuted;
+      soundBtn.textContent = isMuted ? '🔇 Sound Off' : '🔊 Sound On';
+    });
+  }
+  soundBtn.style.display = 'block';
+  last = performance.now();
+  frameId = requestAnimationFrame(loop);
+  
+  bgMusic.currentTime = 0;
+  bgMusic.play().catch(() => {});
+}
+
+function showDeathMenu() {
+  gameOver = true;
+  cancelAnimationFrame(frameId);
+  const finalScore = Math.floor(dist);
+  document.getElementById('finalScore').textContent = `Score: ${finalScore} m`;
+  
+  if (finalScore > highScore) {
+    highScore = finalScore;
+    localStorage.setItem('highScore', highScore);
+  }
+  document.getElementById('highScore').textContent = `High Score: ${highScore} m`;
+  
+  document.getElementById('deathMenu').classList.remove('hidden');
+  
+  bgMusic.pause();
+  // Hide sound button
+  const soundBtn = document.getElementById('soundToggleBtn');
+  if (soundBtn) soundBtn.style.display = 'none';
+}
+
+// Menu event listeners
+document.getElementById('startGame').addEventListener('click', start);
+document.getElementById('restartGame').addEventListener('click', start);
+document.getElementById('backToMenu').addEventListener('click', () => {
+  document.getElementById('deathMenu').classList.add('hidden');
+  document.getElementById('startMenu').classList.remove('hidden');
+});
+
+// Update character buttons in both menus
+function updateCharacterButtons() {
+  document.querySelectorAll('.character-btn').forEach(btn => {
+    const char = btn.dataset.char;
+    // All characters are now unlocked by default
+    btn.classList.remove('locked');
+    btn.title = char === '👸' ? 'ri Character' : 
+               char === '🐱' ? 'Socks Character' : 
+               'Ping Character';
+  });
+}
+
+// Update character selection system with proper player update
+function setupCharacterSelection() {
+  // Function to handle character selection
+  function selectCharacter(char, btn) {
+    if (unlockedCharacters[char]) {
+      // Remove selected class from all buttons in the same menu
+      const menu = btn.closest('.character-select');
+      menu.querySelectorAll('.character-btn').forEach(b => b.classList.remove('selected'));
+      
+      // Add selected class to clicked button
+      btn.classList.add('selected');
+      
+      // Update player character immediately
+      player.character = char;
+      console.log('Character changed to:', char); // Debug log
+      
+      // Update all other menus to match selection
+      document.querySelectorAll('.character-select').forEach(otherMenu => {
+        if (otherMenu !== menu) {
+          otherMenu.querySelectorAll('.character-btn').forEach(otherBtn => {
+            if (otherBtn.dataset.char === char) {
+              otherBtn.classList.add('selected');
+            } else {
+              otherBtn.classList.remove('selected');
+            }
+          });
+        }
+      });
+    }
+  }
+
+  // Setup click handlers for all character buttons
+  document.querySelectorAll('.character-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectCharacter(btn.dataset.char, btn);
+    });
+  });
+}
+
+// Update menu character buttons with ri.png and adjusted socks positioning
+function updateMenuCharacterSelects() {
+  document.querySelectorAll('.character-select').forEach(select => {
+    select.innerHTML = `
+      <button class="character-btn" data-char="👸" data-name="ri">
+        <img class="char-image" src="ri.png" alt="ri">
+        <span class="char-name">ri</span>
+      </button>
+      <button class="character-btn" data-char="🐱" data-name="Socks">
+        <img class="char-image" src="socks.png" alt="Socks" style="margin-top: 4px;">
+        <span class="char-name">Socks</span>
+      </button>
+      <button class="character-btn" data-char="🐰" data-name="Ping">
+        <img class="char-image" src="ping.png" alt="Ping">
+        <span class="char-name">Ping</span>
+      </button>
+    `;
+  });
+  
+  setupCharacterSelection();
+}
+
+updateMenuCharacterSelects();
+updateCharacterButtons();
+
+const initialChar = '👸';
+document.querySelectorAll('.character-select').forEach(select => {
+  const btn = select.querySelector(`[data-char="${initialChar}"]`);
+  if (btn) {
+    btn.classList.add('selected');
+  }
+});
+player.character = initialChar;
+
+window.addEventListener('keydown', e => {
+  if (gameStarted && !gameOver && e.code === 'Space') {
+    e.preventDefault();
+    player.jump();
+  }
+});
+
+canvas.addEventListener('pointerdown', () => {
+  if (gameStarted && !gameOver) {
+    player.jump();
+  }
+});
+
+document.getElementById('startMenu').classList.remove('hidden');
+
+document.querySelector('#shell').style.maxWidth = '1400px';
+
+document.querySelector('#score').style.fontSize = '2rem';
+
+const mountains = [];
+const particles = [];
+const hills = [];
+const stars = [];
+const groundCover = [];
+
+function initBackground() {
+  trees.length = 0;
+  clouds.length = 0;
+  birds.length = 0;
+  mountains.length = 0;
+  particles.length = 0;
+  hills.length = 0;
+  stars.length = 0;
+  groundCover.length = 0;
+  
+  for (let i = 0; i < 80; i++) {
+    stars.push(new Star());
+  }
+  
+  for (let i = 0; i < 3; i++) {
+    mountains.push(new Mountain(canvas.width * (i / 3) + Math.random() * 200));
+  }
+  
+  for (let i = 0; i < 6; i++) {
+    hills.push(new Hill(canvas.width * (i / 6) + Math.random() * 80));
+  }
+  
+  for (let i = 0; i < 15; i++) {
+    groundCover.push(new GroundCover(canvas.width * (i / 15) + Math.random() * 50));
+  }
+  
+  for (let i = 0; i < 7; i++) {
+    trees.push(new Tree(canvas.width * (i / 7) + Math.random() * 100));
+  }
+  
+  for (let i = 0; i < 4; i++) {
+    clouds.push(new Cloud(canvas.width * (i / 4) + Math.random() * 200));
+  }
+
+  for (let i = 0; i < 3; i++) {
+    birds.push(new Bird(canvas.width * (i / 3) + Math.random() * 300));
+  }
+  
+  for (let i = 0; i < 20; i++) {
+    particles.push(new Particle());
+  }
+}
+
+muteBtn.addEventListener('click', () => {
+  isMuted = !isMuted;
+  bgMusic.muted = isMuted;
+  jumpSound.muted = isMuted;
+  muteBtn.textContent = isMuted ? '🔇 Sound Off' : '🔊 Sound On';
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  // Sound toggle button
+  let soundBtn = document.getElementById('soundToggleBtn');
+  if (soundBtn) soundBtn.style.display = 'none';
+});
+</script>
+</body>
+</html>

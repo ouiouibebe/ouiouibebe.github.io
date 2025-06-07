@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mirror Selfie Memory 🪞</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #2F5233;
+      --panel: rgba(210, 180, 140, 0.95);
+      --accent: #8B6914;
+      --accent-dark: #6B5416;
+      --txt: #1B3B1E;
+      --txt-bright: #D2B48C;
+      --card-back: #4A5D23;
+      --card-border: #6B8E3D;
+    }
+    
+    * { box-sizing: border-box; }
+    
+    html, body { 
+      height: 100%; 
+      margin: 0; 
+      font-family: "Nunito", sans-serif; 
+      background: linear-gradient(to bottom, #4A5D23 0%, #6B8E3D 50%, #2F5233 100%); 
+      color: var(--txt);
+      font-weight: 600;
+    }
+
+    h1 { 
+      font-family: "Playfair Display", serif; 
+      font-size: 2.6rem; 
+      margin: 0; 
+      text-align: center; 
+      color: var(--txt); 
+      letter-spacing: .5px;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(210,180,140,0.6);
+    }
+
+    #shell {
+      max-width: 1000px;
+      margin: 2rem auto;
+      background: var(--panel);
+      border-radius: 16px;
+      padding: 2rem 1.5rem 3rem;
+      box-shadow: 0 0 40px rgba(0,0,0,.4);
+      border: 3px solid var(--accent);
+    }
+
+    .game-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 1.5rem 0;
+      font-family: "Playfair Display", serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--txt);
+      text-shadow: 2px 2px 4px rgba(210,180,140,0.6);
+    }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1rem;
+      margin: 2rem 0;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .memory-card {
+      aspect-ratio: 1;
+      position: relative;
+      cursor: pointer;
+      perspective: 1000px;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+
+    .memory-card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 12px;
+      border: 3px solid var(--card-border);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    .card-front {
+      background: var(--card-back);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: var(--txt-bright);
+      background: linear-gradient(135deg, var(--card-back) 0%, #6B8E3D 100%);
+    }
+
+    .card-back {
+      background: white;
+      transform: rotateY(180deg);
+      overflow: hidden;
+    }
+
+    .card-back img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 9px;
+    }
+
+    .memory-card.matched {
+      opacity: 0.7;
+      transform: scale(0.95);
+    }
+
+    .memory-card.matched .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .controls {
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    .btn {
+      background: var(--accent);
+      color: var(--txt-bright);
+      border: 2px solid var(--accent-dark);
+      padding: 1rem 2rem;
+      border-radius: 10px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: "Nunito", sans-serif;
+      font-weight: 700;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+      margin: 0 0.5rem;
+    }
+
+    .btn:hover {
+      background: var(--accent-dark);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    }
+
+    .victory-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(210, 180, 140, 0.98);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+    }
+
+    .victory-screen.hidden {
+      display: none;
+    }
+
+    .victory-content {
+      background: var(--panel);
+      padding: 3rem;
+      border-radius: 16px;
+      text-align: center;
+      max-width: 500px;
+      width: 90%;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 30px rgba(0,0,0,0.4);
+    }
+
+    .victory-content h2 {
+      font-family: "Playfair Display", serif;
+      font-size: 2.5rem;
+      color: var(--txt);
+      margin: 0 0 1rem;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(210,180,140,0.6);
+    }
+
+    .victory-stats {
+      font-size: 1.3rem;
+      color: var(--txt);
+      margin: 1.5rem 0;
+      line-height: 1.6;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    .back-link a {
+      color: var(--accent-dark);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .game-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.8rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .game-info {
+        font-size: 1.2rem;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+    }
+
+    .start-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(210, 180, 140, 0.98);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+    }
+
+    .start-menu.hidden {
+      display: none;
+    }
+
+    .start-content {
+      background: var(--panel);
+      padding: 2.5rem;
+      border-radius: 16px;
+      text-align: center;
+      max-width: 450px;
+      width: 90%;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 30px rgba(0,0,0,0.4);
+    }
+
+    .start-content h2 {
+      font-family: "Playfair Display", serif;
+      font-size: 2.2rem;
+      color: var(--txt);
+      margin: 0;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(210,180,140,0.6);
+    }
+
+    .start-instructions {
+      color: var(--txt);
+      font-weight: 600;
+      text-shadow: 1px 1px 2px rgba(210,180,140,0.6);
+      margin: 1rem 0;
+      line-height: 1.5;
+    }
+
+    .start-btn {
+      background: var(--accent);
+      color: var(--txt-bright);
+      border: 2px solid var(--accent-dark);
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: "Nunito", sans-serif;
+      font-weight: 700;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+      margin-top: 1.5rem;
+    }
+
+    .start-btn:hover {
+      background: var(--accent-dark);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    }
+  </style>
+</head>
+<body>
+  <div id="shell">
+    <h1>Mirror Selfie Memory 🪞</h1>
+    
+    <div class="game-info">
+      <div>Moves: <span id="moveCount">0</span></div>
+      <div>Time: <span id="timeCount">0:00</span></div>
+      <div>Pairs: <span id="pairCount">0</span>/10</div>
+    </div>
+
+    <div class="game-grid" id="gameGrid">
+      <!-- Cards will be generated by JavaScript -->
+    </div>
+
+    <div class="controls">
+      <button class="btn" onclick="resetGame()">New Game</button>
+    </div>
+
+    <div class="back-link">
+      <a href="index.html">← Back to Forest Clearing</a>
+    </div>
+  </div>
+
+  <div id="startMenu" class="start-menu">
+    <div class="start-content">
+      <h2>Mirror Selfie Memory 🪞</h2>
+      <div class="start-instructions">
+        Find all the matching mirror selfies!<br>
+        Click cards to flip them and find pairs.<br>
+        <em>Match all pairs to win!</em>
+      </div>
+      <button class="start-btn" id="startGameBtn">Start Matching</button>
+    </div>
+  </div>
+
+  <div id="victoryScreen" class="victory-screen hidden">
+    <div class="victory-content">
+      <h2>Perfect Memory! 💕</h2>
+      <p style="font-style: italic; color: var(--accent-dark); margin-bottom: 1.5rem;">
+        Just like how every moment with you is unforgettable...
+      </p>
+      <div class="victory-stats">
+        <div>✨ Completed in <span id="finalMoves">0</span> moves</div>
+        <div>⏰ Time: <span id="finalTime">0:00</span></div>
+        <div>🪞 All selfie memories matched!</div>
+      </div>
+      <button class="btn" onclick="resetGame()">Play Again</button>
+    </div>
+  </div>
+
+  <button id="soundToggleBtn" style="position: fixed; top: 30px; left: 30px; z-index: 1300; background: #fffbe6; color: #6B8E3D; border: 2px dashed #bfa76a; border-radius: 8px; padding: 0.5rem 1.2rem; font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 2px 4px 12px rgba(0,0,0,0.13);">🔊 Sound On</button>
+
+  <audio id="bgMusic" loop>
+    <source src="Alvvays - Ones Who Love You.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    // Game state
+    let flippedCards = [];
+    let matchedPairs = 0;
+    let moves = 0;
+    let gameStarted = false;
+    let startTime = null;
+    let timerInterval = null;
+    const bgMusic = document.getElementById('bgMusic');
+
+    // Image paths - replace these with your actual image files
+    const images = [
+      'pics/image1.jpeg',
+      'pics/image2.jpeg', 
+      'pics/image3.jpeg',
+      'pics/image4.jpeg',
+      'pics/image5.jpeg',
+      'pics/image6.JPG',
+      'pics/image7.jpeg',
+      'pics/image8.jpeg',
+      'pics/image9.jpeg',
+      'pics/image10.jpeg'
+    ];
+
+    // Create pairs and shuffle
+    function createCardData() {
+      let pairs = [];
+      // Create pairs with unique IDs to ensure proper randomization
+      images.forEach((img, index) => {
+        pairs.push({id: index * 2, image: img});
+        pairs.push({id: index * 2 + 1, image: img});
+      });
+      return shuffleArray(pairs);
+    }
+
+    function shuffleArray(array) {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
+    function createGameGrid() {
+      const grid = document.getElementById('gameGrid');
+      const cardData = createCardData();
+      
+      grid.innerHTML = '';
+      
+      cardData.forEach((card, index) => {
+        const cardElement = document.createElement('div');
+        cardElement.className = 'memory-card';
+        cardElement.dataset.image = card.image;
+        cardElement.dataset.id = card.id;
+        
+        cardElement.innerHTML = `
+          <div class="card-inner">
+            <div class="card-front">
+              🪞
+            </div>
+            <div class="card-back">
+              <img src="${card.image}" alt="Memory" />
+            </div>
+          </div>
+        `;
+        
+        cardElement.addEventListener('click', () => flipCard(cardElement));
+        grid.appendChild(cardElement);
+      });
+    }
+
+    // Initialize game on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      // Show start menu initially
+      document.getElementById('startMenu').classList.remove('hidden');
+      document.getElementById('startGameBtn').addEventListener('click', startNewGame);
+      // Sound toggle button
+      let soundBtn = document.getElementById('soundToggleBtn');
+      if (!soundBtn) {
+        soundBtn = document.createElement('button');
+        soundBtn.id = 'soundToggleBtn';
+        soundBtn.style.position = 'fixed';
+        soundBtn.style.top = '30px';
+        soundBtn.style.left = '30px';
+        soundBtn.style.zIndex = '1300';
+        soundBtn.style.background = '#fffbe6';
+        soundBtn.style.color = '#6B8E3D';
+        soundBtn.style.border = '2px dashed #bfa76a';
+        soundBtn.style.borderRadius = '8px';
+        soundBtn.style.padding = '0.5rem 1.2rem';
+        soundBtn.style.fontFamily = "'Playfair Display', serif";
+        soundBtn.style.fontSize = '1.1rem';
+        soundBtn.style.fontWeight = '700';
+        soundBtn.style.cursor = 'pointer';
+        soundBtn.style.boxShadow = '2px 4px 12px rgba(0,0,0,0.13)';
+        soundBtn.textContent = '🔊 Sound On';
+        soundBtn.style.display = 'none';
+        document.body.appendChild(soundBtn);
+      }
+      let isMuted = false;
+      soundBtn.addEventListener('click', () => {
+        isMuted = !isMuted;
+        bgMusic.muted = isMuted;
+        soundBtn.textContent = isMuted ? '🔇 Sound Off' : '🔊 Sound On';
+      });
+      // Always hide sound button on start
+      soundBtn.style.display = 'none';
+    });
+
+    function startNewGame() {
+      console.log('Starting new game...'); // Debug log
+      
+      // Hide start menu
+      document.getElementById('startMenu').classList.add('hidden');
+      
+      // Reset game state
+      flippedCards = [];
+      matchedPairs = 0;
+      moves = 0;
+      gameStarted = false;
+      startTime = null;
+      clearInterval(timerInterval);
+      
+      // Reset UI
+      document.getElementById('moveCount').textContent = '0';
+      document.getElementById('timeCount').textContent = '0:00';
+      document.getElementById('pairCount').textContent = '0';
+      document.getElementById('victoryScreen').classList.add('hidden');
+      
+      // Start music
+      bgMusic.volume = 0.3;
+      bgMusic.currentTime = 0;
+      bgMusic.play().catch(err => console.log('Music play error:', err));
+      
+      // Create new game grid
+      createGameGrid();
+
+      // Show sound button only during gameplay
+      const soundBtn = document.getElementById('soundToggleBtn');
+      if (soundBtn) soundBtn.style.display = 'block';
+    }
+
+    function flipCard(card) {
+      if (!gameStarted) {
+        gameStarted = true;
+        startTime = Date.now();
+        timerInterval = setInterval(updateTimer, 1000);
+      }
+      
+      // Don't flip if card is already flipped, matched, or if 2 cards are already showing
+      if (card.classList.contains('flipped') || 
+          card.classList.contains('matched') || 
+          flippedCards.length >= 2) {
+        return;
+      }
+
+      card.classList.add('flipped');
+      flippedCards.push(card);
+
+      if (flippedCards.length === 2) {
+        moves++;
+        updateMoveCount();
+        checkForMatch();
+      }
+    }
+
+    function checkForMatch() {
+      const [card1, card2] = flippedCards;
+      const image1 = card1.dataset.image;
+      const image2 = card2.dataset.image;
+
+      if (image1 === image2) {
+        // Match found!
+        setTimeout(() => {
+          card1.classList.add('matched');
+          card2.classList.add('matched');
+          matchedPairs++;
+          updatePairCount();
+          flippedCards = [];
+          
+          if (matchedPairs === 10) {
+            endGame();
+          }
+        }, 1000);
+      } else {
+        // No match, flip back
+        setTimeout(() => {
+          card1.classList.remove('flipped');
+          card2.classList.remove('flipped');
+          flippedCards = [];
+        }, 1500);
+      }
+    }
+
+    function updateTimer() {
+      if (!startTime) return;
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const minutes = Math.floor(elapsed / 60);
+      const seconds = elapsed % 60;
+      document.getElementById('timeCount').textContent = 
+        `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function updateMoveCount() {
+      document.getElementById('moveCount').textContent = moves;
+    }
+
+    function updatePairCount() {
+      document.getElementById('pairCount').textContent = matchedPairs;
+    }
+
+    function endGame() {
+      clearInterval(timerInterval);
+      bgMusic.pause();
+      bgMusic.currentTime = 0;
+      
+      // Show victory screen
+      document.getElementById('finalMoves').textContent = moves;
+      document.getElementById('finalTime').textContent = 
+        document.getElementById('timeCount').textContent;
+      document.getElementById('victoryScreen').classList.remove('hidden');
+
+      // Hide sound button on victory
+      const soundBtn = document.getElementById('soundToggleBtn');
+      if (soundBtn) soundBtn.style.display = 'none';
+    }
+
+    function resetGame() {
+      // Reset game state
+      flippedCards = [];
+      matchedPairs = 0;
+      moves = 0;
+      gameStarted = false;
+      startTime = null;
+      clearInterval(timerInterval);
+      
+      // Reset UI
+      document.getElementById('moveCount').textContent = '0';
+      document.getElementById('timeCount').textContent = '0:00';
+      document.getElementById('pairCount').textContent = '0';
+      document.getElementById('victoryScreen').classList.add('hidden');
+      document.getElementById('startMenu').classList.remove('hidden');
+
+      // Hide sound button on reset/start menu
+      const soundBtn = document.getElementById('soundToggleBtn');
+      if (soundBtn) soundBtn.style.display = 'none';
+    }
+  </script>
+</body>
+</html> 

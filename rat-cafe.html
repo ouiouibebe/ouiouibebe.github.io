@@ -1,0 +1,2460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ri's Rat Cafe 🐀</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #4A3520;
+      --panel: rgba(210, 180, 140, 0.95);
+      --accent: #8B6914;
+      --accent-dark: #6B5416;
+      --txt: #2C1810;
+      --txt-bright: #D2B48C;
+      --coffee: #6F4E37;
+      --coffee-light: #A67B5B;
+      --coffee-dark: #3C2A1F;
+    }
+    
+    * { box-sizing: border-box; }
+    
+    html, body { 
+      height: 100%; 
+      margin: 0; 
+      font-family: "Nunito", sans-serif; 
+      background: linear-gradient(to bottom, #6F4E37 0%, #4A3520 50%, #2C1810 100%); 
+      color: var(--txt);
+      font-weight: 600;
+    }
+
+    h1 { 
+      font-family: "Playfair Display", serif; 
+      font-size: 2.6rem; 
+      margin: 0; 
+      text-align: center; 
+      color: var(--txt); 
+      letter-spacing: .5px;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(210,180,140,0.6);
+    }
+
+    #shell {
+      max-width: 1200px;
+      margin: 2rem auto;
+      background: var(--panel);
+      border-radius: 16px;
+      padding: 2rem 1.5rem 3rem;
+      box-shadow: 0 0 40px rgba(0,0,0,.4);
+      border: 3px solid var(--accent);
+    }
+
+    .game-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 1.5rem 0;
+      font-family: "Playfair Display", serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--txt);
+      text-shadow: 2px 2px 4px rgba(210,180,140,0.6);
+    }
+
+    .game-area {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      gap: 2rem;
+      margin: 2rem 0;
+      min-height: 600px;
+    }
+
+    .preparation-stations {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .order-station {
+      background: var(--coffee-light);
+      border-radius: 12px;
+      padding: 1rem;
+      border: 2px solid var(--coffee-dark);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 1rem;
+    }
+
+    .customer {
+      background: var(--panel);
+      border-radius: 8px;
+      padding: 1rem;
+      border: 2px solid var(--accent);
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      position: relative;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      height: fit-content;
+    }
+
+    .customer.drag-over {
+      border: 3px dashed var(--accent);
+      background: rgba(139, 105, 20, 0.1);
+      transform: scale(1.02);
+    }
+
+    .customer.drag-over .customer-name {
+      color: var(--accent-dark);
+    }
+
+    .customer.drag-over .customer-avatar {
+      transform: scale(1.1);
+    }
+
+    .prepared-item {
+      background: var(--panel);
+      border: 2px solid var(--accent);
+      border-radius: 8px;
+      padding: 0.5rem;
+      margin: 0.3rem 0;
+      cursor: grab;
+      user-select: none;
+      transition: all 0.2s ease;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 40px;
+      max-width: 200px;
+    }
+
+    .prepared-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .prepared-item.dragging {
+      opacity: 0.8;
+      transform: scale(1.05);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    }
+
+    .prepared-item .item-name {
+      font-weight: bold;
+      color: var(--accent-dark);
+      font-size: 0.9rem;
+      margin-right: 0.5rem;
+    }
+
+    .prepared-item .item-price {
+      color: var(--accent-dark);
+      font-size: 0.9rem;
+      margin-right: 0.5rem;
+    }
+
+    .prepared-item .trash-btn {
+      background: #8B0000;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.2rem 0.4rem;
+      font-size: 0.7rem;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .prepared-item:hover .trash-btn {
+      opacity: 1;
+    }
+
+    .prepared-items-area {
+      background: rgba(210, 180, 140, 0.3);
+      border-radius: 8px;
+      padding: 0.8rem;
+      margin-top: 1rem;
+      min-height: 80px;
+      max-height: 160px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .prepared-items-title {
+      font-weight: bold;
+      color: var(--accent-dark);
+      margin-bottom: 0.5rem;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .customer:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .customer.selected {
+      border: 3px solid var(--accent);
+      box-shadow: 0 0 15px rgba(139, 105, 20, 0.4);
+      transform: scale(1.02);
+      background: rgba(210, 180, 140, 0.98);
+    }
+
+    .customer.selected::before {
+      content: "✓";
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: var(--accent);
+      color: var(--txt-bright);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .customer.selected .customer-name {
+      color: var(--accent-dark);
+    }
+
+    .customer.selected .customer-avatar {
+      border-color: var(--accent-dark);
+      transform: scale(1.1);
+    }
+
+    .customer.eepy {
+      background: rgba(210, 180, 140, 0.8);
+    }
+
+    .customer.goblin {
+      background: rgba(139, 69, 19, 0.8);
+      border-color: var(--accent-dark);
+    }
+
+    .customer-avatar {
+      width: 60px;
+      height: 60px;
+      background: var(--coffee);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      border: 2px solid var(--coffee-dark);
+      overflow: hidden;  /* Add this to keep the image round */
+    }
+
+    .customer-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;  /* This will ensure the image covers the space properly */
+    }
+
+    .customer-info {
+      flex: 1;
+      padding-bottom: 1.5rem;
+    }
+
+    .customer-name {
+      font-family: "Playfair Display", serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--txt);
+      margin-bottom: 0.3rem;
+    }
+
+    .customer-order {
+      font-size: 0.9rem;
+      color: var(--txt);
+      margin-bottom: 0.5rem;
+    }
+
+    .customer-timer {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--accent-dark);
+    }
+
+    .customer-status {
+      position: absolute;
+      bottom: 1.2rem;
+      right: 0.5rem;
+      font-size: 0.8rem;
+      font-style: italic;
+      max-width: 80%;
+      text-align: right;
+      padding-left: 0.5rem;
+    }
+
+    .customer.eepy .customer-status {
+      color: #6B8E3D;
+    }
+
+    .customer.goblin .customer-status {
+      color: #8B0000;
+    }
+
+    .patience-bar {
+      height: 4px;
+      background: var(--coffee-dark);
+      border-radius: 2px;
+      margin-top: 0.5rem;
+      overflow: hidden;
+      position: absolute;
+      bottom: 0.5rem;
+      left: 0.5rem;
+      right: 0.5rem;
+      width: calc(100% - 1rem);
+    }
+
+    .patience-fill {
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.3s linear;
+    }
+
+    .customer.eepy .patience-fill {
+      background: #6B8E3D;
+    }
+
+    .customer.goblin .patience-fill {
+      background: #8B0000;
+    }
+
+    .work-station {
+      background: var(--coffee);
+      border-radius: 12px;
+      padding: 1rem;
+      border: 2px solid var(--coffee-dark);
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .coffee-station, .snack-station {
+      background: var(--coffee-light);
+      border-radius: 8px;
+      padding: 1rem;
+      border: 2px solid var(--coffee-dark);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      height: 100%;
+    }
+
+    .station-header {
+      font-family: "Playfair Display", serif;
+      font-size: 1.4rem;
+      color: var(--txt);
+      text-align: center;
+      margin-bottom: 0.5rem;
+      text-shadow: 1px 1px 2px rgba(210,180,140,0.6);
+    }
+
+    .preparation-area {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(210, 180, 140, 0.3);
+      border-radius: 8px;
+    }
+
+    .ingredient {
+      background: var(--panel);
+      border: 2px solid var(--accent);
+      border-radius: 8px;
+      padding: 0.8rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .ingredient:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .ingredient.selected {
+      background: var(--accent);
+      color: var(--txt-bright);
+    }
+
+    .ingredient.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .preparation-progress {
+      height: 8px;
+      background: var(--coffee-dark);
+      border-radius: 4px;
+      margin-top: 1rem;
+      overflow: hidden;
+      display: none;
+    }
+
+    .preparation-progress.active {
+      display: block;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.1s linear;
+    }
+
+    .serve-btn {
+      background: var(--accent);
+      color: var(--txt-bright);
+      border: 2px solid var(--accent-dark);
+      padding: 0.8rem;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: "Nunito", sans-serif;
+      font-weight: 700;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+      margin-top: auto;
+      display: block;  /* Changed from 'none' to 'block' */
+    }
+
+    .serve-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: var(--accent-dark);
+    }
+
+    .serve-btn:hover:not(:disabled) {
+      background: var(--accent-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .current-order {
+      background: rgba(210, 180, 140, 0.3);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .current-order.active {
+      display: block;
+    }
+
+    .order-title {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--txt);
+    }
+
+    .order-items {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem;
+      background: var(--panel);
+      border-radius: 4px;
+      border: 1px solid var(--accent);
+    }
+
+    .order-item.completed {
+      background: rgba(107, 142, 61, 0.3);
+      border-color: #6B8E3D;
+    }
+
+    .start-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(74, 53, 32, 0.98);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+    }
+
+    .start-menu.hidden {
+      display: none;
+    }
+
+    .start-content {
+      background: var(--panel);
+      padding: 2.5rem;
+      border-radius: 16px;
+      text-align: center;
+      max-width: 450px;
+      width: 90%;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 30px rgba(0,0,0,0.4);
+    }
+
+    .start-content h2 {
+      font-family: "Playfair Display", serif;
+      font-size: 2.2rem;
+      color: var(--txt);
+      margin: 0;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(210,180,140,0.6);
+    }
+
+    .start-instructions {
+      color: var(--txt);
+      font-weight: 600;
+      text-shadow: 1px 1px 2px rgba(210,180,140,0.6);
+      margin: 1rem 0;
+      line-height: 1.5;
+    }
+
+    .start-btn {
+      background: var(--accent);
+      color: var(--txt-bright);
+      border: 2px solid var(--accent-dark);
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: "Nunito", sans-serif;
+      font-weight: 700;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+      margin-top: 1.5rem;
+    }
+
+    .start-btn:hover {
+      background: var(--accent-dark);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    .back-link a {
+      color: var(--accent-dark);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .preparation-stations {
+        grid-template-columns: 1fr;
+      }
+      
+      .order-station {
+        grid-template-columns: 1fr;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .game-info {
+        font-size: 1.2rem;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-10px); }
+    }
+
+    @keyframes highlight {
+      0% { transform: scale(1.02); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1.02); }
+    }
+  </style>
+</head>
+<body>
+  <div id="shell">
+    <h1>Ri's Rat Cafe 🐀</h1>
+    
+    <div class="game-info">
+      <div>Day: <span id="dayCount">1</span></div>
+      <div>Money: $<span id="moneyCount">0</span></div>
+      <div>Rating: <span id="ratingCount">5.0</span> ⭐</div>
+    </div>
+
+    <div class="game-area">
+      <div class="preparation-stations">
+        <div class="coffee-station" id="coffeeStation">
+          <!-- Coffee making interface will go here -->
+        </div>
+        <div class="snack-station" id="snackStation">
+          <!-- Snack preparation interface will go here -->
+        </div>
+      </div>
+      <div class="order-station" id="orderStation">
+        <!-- Order queue will go here -->
+      </div>
+    </div>
+
+    <div class="back-link">
+      <a href="index.html">← Back to Forest Clearing</a>
+    </div>
+  </div>
+
+  <div id="startMenu" class="start-menu">
+    <div class="start-content">
+      <h2>Ri's Rat Cafe 🐀</h2>
+      <div class="start-instructions">
+        Welcome to the Rat Cafe!<br>
+        Take orders from rat customers,<br>
+        Make their coffee and snacks,<br>
+        and serve them with care!<br>
+        <em>Watch out for eepy rats and goblin mode!</em>
+      </div>
+      <button class="start-btn" id="startGameBtn">Start Serving</button>
+    </div>
+  </div>
+
+  <audio id="bgMusic" loop>
+    <source src="Dominic Fike - Pasture Child (Official Audio).mp3" type="audio/mpeg">
+  </audio>
+
+  <div id="recipeSheetBtn" style="position: fixed; top: 30px; right: 30px; z-index: 1200; cursor: pointer; background: none; border: none; outline: none;">
+    <span style="font-family: 'Playfair Display', serif; font-size: 1.3rem; background: #fffbe6; color: #6B4F1D; border: 2px dashed #bfa76a; border-radius: 8px; padding: 0.5rem 1.2rem; box-shadow: 2px 4px 12px rgba(0,0,0,0.18); font-weight: 700; letter-spacing: 1px;">📌 RIcipes</span>
+  </div>
+  <div id="recipeSheetOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(60,40,20,0.18); z-index: 2000;">
+    <div id="recipeSheetPaper" style="position: absolute; top: 30px; left: 50%; transform: translateX(-50%) rotate(-2deg); min-width: 340px; max-width: 90vw; background: #fffbe6; border: 3px dashed #bfa76a; border-radius: 0 0 40px 30px/0 0 60px 50px; box-shadow: 0 8px 32px rgba(0,0,0,0.25), 0 0 0 8px #f7e7b6 inset; padding: 1.2rem 2.5rem 1.5rem 2.5rem; font-family: 'Playfair Display', serif; color: #6B4F1D; font-size: 1.1rem; line-height: 1.7; cursor: pointer; user-select: none; border-top: 0;">
+      <div style="position: absolute; top: -32px; left: 50%; transform: translateX(-50%); font-size: 2.2rem;">📌</div>
+      <div style="font-family: 'Playfair Display', serif; font-size: 2.1rem; font-weight: 700; text-align: center; margin-bottom: 0.7rem; letter-spacing: 2px; text-shadow: 1px 1px 0 #f7e7b6;">RIcipes</div>
+      <div id="recipeSheetContent" style="font-family: 'Nunito', cursive; font-size: 1.1rem; white-space: pre-line;"></div>
+      <div style="text-align: center; margin-top: 1.2rem; font-size: 0.95rem; color: #bfa76a; font-style: italic;">(Click anywhere to close)</div>
+    </div>
+  </div>
+
+  <button id="soundToggleBtn" style="position: fixed; top: 30px; left: 30px; z-index: 1300; background: #fffbe6; color: #6B4F1D; border: 2px dashed #bfa76a; border-radius: 8px; padding: 0.5rem 1.2rem; font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 2px 4px 12px rgba(0,0,0,0.13);">🔊 Sound On</button>
+
+  <script>
+    // Game state
+    let day = 1;
+    let money = 0;
+    let rating = 5.0;
+    let gameStarted = false;
+    let customers = [];
+    let currentCustomerId = 0;
+    let currentOrder = null;
+    let preparationProgress = 0;
+    let preparationInterval = null;
+    let selectedIngredients = new Set();
+    const bgMusic = document.getElementById('bgMusic');
+
+    // Add these after the existing game state variables
+    let dayGoal = 0;
+    let dayProgress = 0;
+    let dayCustomersServed = 0;
+    let dayStartTime = 0;
+    let dayEndTime = 0;
+    let isDayActive = false;
+    let dayCustomerSpawnRate = 4000; // Base spawn rate in ms
+    let dayMaxCustomers = 5; // Base max customers
+
+    // Customer types and their characteristics
+    const CUSTOMER_TYPES = {
+      normal: {
+        name: "Regular Rat",
+        patience: 75,
+        tipMultiplier: 1,
+        status: "Just a regular rat",
+        spawnWeight: 6,
+        ratingPenalty: 0.2,
+        avatar: "ratpics/regrat.jpeg",
+        experimentalChance: 0.1  // 10% chance for experimental drinks
+      },
+      eepy: {
+        name: "Eepy Rat",
+        patience: 100,
+        tipMultiplier: 1.5,
+        status: "So sleepy...",
+        spawnWeight: 3,
+        ratingPenalty: 0.3,
+        avatar: "ratpics/eepyrat.jpeg",
+        experimentalChance: 0.2  // 20% chance for experimental drinks
+      },
+      goblin: {
+        name: "Goblin Rat",
+        patience: 60,
+        tipMultiplier: 2,
+        status: "Goblin mode activated!",
+        spawnWeight: 2,
+        ratingPenalty: 0.4,
+        avatar: "ratpics/goblinrat.jpeg",
+        experimentalChance: 0.4  // 40% chance for experimental drinks - they love chaos!
+      }
+    };
+
+    // Add experimental drink combinations
+    const EXPERIMENTAL_DRINKS = [
+      {
+        name: "Chocolate Chai",
+        ingredients: ['steamedMilk', 'chocolate', 'chai'],  // Changed order
+        price: 5.75,
+        time: 40
+      },
+      {
+        name: "Iced Caramel Matcha",
+        ingredients: ['ice', 'caramel', 'coldMilk', 'matcha'],  // Changed order
+        price: 6.00,
+        time: 45
+      },
+      {
+        name: "Tea Latte",
+        ingredients: ['foam', 'steamedMilk', 'teaBag'],  // Changed order
+        price: 4.75,
+        time: 35
+      },
+      {
+        name: "Mocha Chai",
+        ingredients: ['whippedCream', 'chocolate', 'chai', 'steamedMilk'],  // Changed order
+        price: 6.25,
+        time: 45
+      }
+    ];
+
+    // Menu items with more complex combinations
+    const MENU_ITEMS = {
+      drinks: [
+        { 
+          name: "Espresso", 
+          price: 3.50, 
+          time: 20,
+          ingredients: ['espresso']
+        },
+        { 
+          name: "Americano", 
+          price: 3.75, 
+          time: 25,
+          ingredients: ['espresso', 'hotWater']
+        },
+        { 
+          name: "Latte", 
+          price: 4.50, 
+          time: 30,
+          ingredients: ['espresso', 'steamedMilk']
+        },
+        { 
+          name: "Cappuccino", 
+          price: 4.00, 
+          time: 25,
+          ingredients: ['espresso', 'steamedMilk', 'foam']
+        },
+        { 
+          name: "Flat White", 
+          price: 4.25, 
+          time: 25,
+          ingredients: ['espresso', 'steamedMilk', 'microfoam']
+        },
+        { 
+          name: "Mocha", 
+          price: 4.75, 
+          time: 35,
+          ingredients: ['espresso', 'steamedMilk', 'chocolate', 'whippedCream']
+        },
+        { 
+          name: "Caramel Latte", 
+          price: 5.00, 
+          time: 35,
+          ingredients: ['espresso', 'steamedMilk', 'caramel']
+        },
+        { 
+          name: "Vanilla Latte", 
+          price: 5.00, 
+          time: 35,
+          ingredients: ['espresso', 'steamedMilk', 'vanilla']
+        },
+        { 
+          name: "Tea", 
+          price: 3.00, 
+          time: 15,
+          ingredients: ['teaBag', 'hotWater']
+        },
+        { 
+          name: "Chai Latte", 
+          price: 4.75, 
+          time: 35,
+          ingredients: ['chai', 'steamedMilk']
+        },
+        { 
+          name: "London Fog", 
+          price: 4.75, 
+          time: 35,
+          ingredients: ['earlGrey', 'steamedMilk', 'vanilla']
+        },
+        { 
+          name: "Matcha Latte", 
+          price: 5.25, 
+          time: 35,
+          ingredients: ['matcha', 'steamedMilk']
+        },
+        { 
+          name: "Iced Matcha", 
+          price: 5.50, 
+          time: 30,
+          ingredients: ['matcha', 'coldMilk', 'ice']
+        }
+      ],
+      snacks: [
+        { 
+          name: "Croissant", 
+          price: 2.50, 
+          time: 10,
+          ingredients: ['croissant']
+        },
+        { 
+          name: "Cookie", 
+          price: 2.00, 
+          time: 8,
+          ingredients: ['cookie']
+        },
+        { 
+          name: "Muffin", 
+          price: 3.00, 
+          time: 12,
+          ingredients: ['muffin']
+        },
+        { 
+          name: "Scone", 
+          price: 3.50, 
+          time: 15,
+          ingredients: ['scone']
+        }
+      ]
+    };
+
+    const COFFEE_INGREDIENTS = {
+      espresso: { name: "Espresso Shot", time: 10 },
+      hotWater: { name: "Hot Water", time: 5 },
+      steamedMilk: { name: "Steamed Milk", time: 8 },
+      coldMilk: { name: "Cold Milk", time: 5 },
+      foam: { name: "Milk Foam", time: 5 },
+      microfoam: { name: "Microfoam", time: 6 },
+      whippedCream: { name: "Whipped Cream", time: 3 },
+      chocolate: { name: "Chocolate", time: 3 },
+      caramel: { name: "Caramel", time: 3 },
+      vanilla: { name: "Vanilla", time: 2 },
+      chai: { name: "Chai Mix", time: 4 },
+      teaBag: { name: "Tea Bag", time: 2 },
+      earlGrey: { name: "Earl Grey Tea", time: 3 },
+      matcha: { name: "Matcha Powder", time: 3 },
+      ice: { name: "Ice", time: 2 }
+    };
+
+    const SNACK_INGREDIENTS = {
+      croissant: { name: "Croissant", time: 5 },
+      cookie: { name: "Cookie", time: 3 },
+      muffin: { name: "Muffin", time: 6 },
+      scone: { name: "Scone", time: 7 }
+    };
+
+    // Add this after the existing CUSTOMER_TYPES
+    const DAY_SETTINGS = {
+      getDayGoal: (day) => {
+        // Start with just 2 customers on day 1, increase by 1 every day
+        return 2 + (day - 1);
+      },
+      getCustomerSpawnRate: (day) => {
+        // Start faster on day 1 (5s), decrease by 400ms each day, minimum 1.2s
+        return Math.max(1200, 5000 - ((day - 1) * 400));
+      },
+      getMaxCustomers: (day) => {
+        // Start with 2 max customers, increase by 1 every day
+        return 2 + (day - 1);
+      },
+      getCustomerPatience: (day, basePatience) => {
+        // Start with extra patience on day 1, gradually reduce
+        const dayBonus = Math.max(0, 1.5 - (day * 0.1)); // 50% more time on day 1, decreasing by 10% each day
+        return Math.floor(basePatience * (1 + dayBonus));
+      },
+      getComplexOrderChance: (day) => {
+        // Day 1: 0% chance of complex order
+        // Day 2: 10% chance
+        // Day 3: 20% chance
+        // Day 4: 30% chance
+        // Max 40% chance
+        return Math.min(0.4, (day - 1) * 0.1);
+      },
+      getMultiItemChance: (day) => {
+        // Day 1: 10% chance of 2 items
+        // Day 2: 20% chance
+        // Day 3: 30% chance
+        // Day 4: 40% chance
+        // Max 50% chance
+        return Math.min(0.5, 0.1 + ((day - 1) * 0.1));
+      },
+      getDrinkChance: (day) => {
+        // Day 1: 90% chance for a drink
+        // Gradually decrease to 70% minimum
+        return Math.max(0.7, 0.9 - ((day - 1) * 0.05));
+      },
+      getSnackChance: (day) => {
+        // Day 1: 30% chance for a snack
+        // Gradually increase to 70% maximum
+        return Math.min(0.7, 0.3 + ((day - 1) * 0.1));
+      },
+      getExperimentalChance: (day) => {
+        // No experimental drinks on day 1
+        if (day === 1) return 0;
+        // Start at 50% of customer's base chance on day 2, increase by 10% each day
+        return Math.min(1, 0.5 + ((day - 2) * 0.1));
+      }
+    };
+
+    // Add this with other game constants at the top
+    const GAME_SETTINGS = {
+      STARTING_RATING: 4.0,  // Starting rating (out of 5)
+      STARTING_MONEY: 0,     // Starting money
+      STARTING_DAY: 1        // Starting day
+    };
+
+    // Add this after MENU_ITEMS
+    const RECIPES = {
+      'Espresso': ['espresso'],
+      'Americano': ['hotWater', 'espresso'],  // Changed order to demonstrate it doesn't matter
+      'Latte': ['steamedMilk', 'espresso'],   // Changed order to demonstrate it doesn't matter
+      'Cappuccino': ['foam', 'steamedMilk', 'espresso'],  // Changed order to demonstrate it doesn't matter
+      'Flat White': ['microfoam', 'steamedMilk', 'espresso'],
+      'Mocha': ['whippedCream', 'chocolate', 'steamedMilk', 'espresso'],
+      'Caramel Latte': ['caramel', 'steamedMilk', 'espresso'],
+      'Vanilla Latte': ['vanilla', 'steamedMilk', 'espresso'],
+      'Tea': ['hotWater', 'teaBag'],  // Changed order to demonstrate it doesn't matter
+      'Chai Latte': ['steamedMilk', 'chai'],
+      'London Fog': ['vanilla', 'steamedMilk', 'earlGrey'],
+      'Matcha Latte': ['steamedMilk', 'matcha'],
+      'Iced Matcha': ['ice', 'coldMilk', 'matcha']
+    };
+
+    const RECIPE_PRICES = {
+      'Espresso': 3.50,
+      'Americano': 3.75,
+      'Latte': 4.50,
+      'Cappuccino': 4.00,
+      'Flat White': 4.25,
+      'Mocha': 4.75,
+      'Caramel Latte': 5.00,
+      'Vanilla Latte': 5.00,
+      'Tea': 3.00,
+      'Chai Latte': 4.75,
+      'London Fog': 4.75,
+      'Matcha Latte': 5.25,
+      'Iced Matcha': 5.50
+    };
+
+    const RECIPE_TIMES = {
+      'Espresso': 20,
+      'Americano': 25,
+      'Latte': 30,
+      'Cappuccino': 25,
+      'Flat White': 25,
+      'Mocha': 35,
+      'Caramel Latte': 35,
+      'Vanilla Latte': 35,
+      'Tea': 15,
+      'Chai Latte': 35,
+      'London Fog': 35,
+      'Matcha Latte': 35,
+      'Iced Matcha': 30
+    };
+
+    let currentDrink = null;
+    let currentDrinkProgress = 0;
+    let currentDrinkInterval = null;
+
+    function getDrinkFromIngredients(ingredients) {
+      // Convert ingredients to an array and sort them
+      const ingredientArray = Array.from(ingredients).sort();
+      
+      // First check experimental drinks
+      for (const drink of EXPERIMENTAL_DRINKS) {
+        // Sort the recipe ingredients for comparison
+        const sortedRecipe = [...drink.ingredients].sort();
+        
+        // Check if arrays have same length and same elements
+        if (ingredientArray.length === sortedRecipe.length &&
+            ingredientArray.every((ing, i) => ing === sortedRecipe[i])) {
+          return {
+            name: drink.name,
+            price: drink.price,
+            time: drink.time,
+            isExperimental: true
+          };
+        }
+      }
+      
+      // Then check regular recipes
+      for (const [drink, recipe] of Object.entries(RECIPES)) {
+        // Sort the recipe ingredients for comparison
+        const sortedRecipe = [...recipe].sort();
+        
+        // Check if arrays have same length and same elements
+        if (ingredientArray.length === sortedRecipe.length &&
+            ingredientArray.every((ing, i) => ing === sortedRecipe[i])) {
+          return {
+            name: drink,
+            price: RECIPE_PRICES[drink],
+            time: RECIPE_TIMES[drink]
+          };
+        }
+      }
+      
+      // If no recipe matches, it's a truly experimental drink
+      return {
+        name: "Mystery Concoction",
+        price: 3.00 + (ingredientArray.length * 0.75),
+        time: 20 + (ingredientArray.length * 5),
+        isExperimental: true
+      };
+    }
+
+    function toggleIngredient(station, id, element) {
+      if (element.classList.contains('disabled')) return;
+
+      if (station === 'snack') {
+        // For snacks, only allow one ingredient at a time
+        const ingredients = document.querySelectorAll(`#${station}Ingredients .ingredient`);
+        ingredients.forEach(ing => {
+          if (ing !== element) {
+            ing.classList.remove('selected');
+            selectedIngredients.delete(ing.dataset.id);
+          }
+        });
+        
+        if (selectedIngredients.has(id)) {
+          selectedIngredients.delete(id);
+          element.classList.remove('selected');
+        } else {
+          selectedIngredients.clear();
+          selectedIngredients.add(id);
+          element.classList.add('selected');
+        }
+      } else {
+        // For coffee, allow multiple ingredients but prevent duplicates
+        if (selectedIngredients.has(id)) {
+          selectedIngredients.delete(id);
+          element.classList.remove('selected');
+        } else {
+          // Don't allow multiple of the same ingredient
+          selectedIngredients.add(id);
+          element.classList.add('selected');
+        }
+      }
+
+      const makeBtn = document.getElementById(`make${station.charAt(0).toUpperCase() + station.slice(1)}Btn`);
+      const currentOrderEl = document.getElementById(`${station}Order`);
+      
+      if (!makeBtn) {
+        console.error(`Make button not found for ${station}`);
+        return;
+      }
+      
+      if (station === 'coffee') {
+        // For coffee station, show what drink would be made
+        const drink = getDrinkFromIngredients(Array.from(selectedIngredients));
+        currentOrderEl.classList.add('active');
+        currentOrderEl.innerHTML = `
+          <div class="order-title">Current Mix:</div>
+          <div class="order-items">
+            <div class="order-item">
+              <span>${drink.name}</span>
+              <span>$${drink.price.toFixed(2)}</span>
+            </div>
+            ${drink.isExperimental ? '<div style="color: #8B6914; font-style: italic; margin-top: 0.5rem;">Experimental drink!</div>' : ''}
+          </div>
+        `;
+        
+        // Enable make button if we have ingredients
+        makeBtn.disabled = selectedIngredients.size === 0;
+      } else {
+        // For snack station, show what snack would be made
+        const snack = getSnackFromIngredients(Array.from(selectedIngredients));
+        currentOrderEl.classList.add('active');
+        if (snack) {
+          currentOrderEl.innerHTML = `
+            <div class="order-title">Current Mix:</div>
+            <div class="order-items">
+              <div class="order-item">
+                <span>${snack.name}</span>
+                <span>$${snack.price.toFixed(2)}</span>
+              </div>
+            </div>
+          `;
+          makeBtn.disabled = false;
+        } else {
+          currentOrderEl.innerHTML = `
+            <div class="order-title">Current Mix:</div>
+            <div class="order-items">
+              <div class="order-item" style="color: #8B6914; font-style: italic;">
+                Select a snack to prepare
+              </div>
+            </div>
+          `;
+          makeBtn.disabled = true;
+        }
+      }
+    }
+
+    function getRequiredIngredients(itemName) {
+      const menuItem = [...MENU_ITEMS.drinks, ...MENU_ITEMS.snacks].find(item => item.name === itemName);
+      return menuItem ? menuItem.ingredients : [];
+    }
+
+    function startPreparation(station) {
+      const progressBar = document.getElementById(`${station}Progress`);
+      const progressFill = document.getElementById(`${station}ProgressFill`);
+      const serveBtn = document.getElementById(`serve${station.charAt(0).toUpperCase() + station.slice(1)}Btn`);
+      
+      // Don't restart if already preparing
+      if (progressBar.classList.contains('active')) return;
+      
+      // Calculate total preparation time
+      const orderItem = station === 'coffee' ? currentOrder.order.drink : currentOrder.order.snack;
+      const totalTime = Array.from(selectedIngredients).reduce((total, ing) => {
+        const ingredient = station === 'coffee' ? COFFEE_INGREDIENTS[ing] : SNACK_INGREDIENTS[ing];
+        return total + ingredient.time;
+      }, 0);
+
+      preparationProgress = 0;
+      progressBar.classList.add('active');
+      serveBtn.disabled = true;
+
+      // Disable all ingredients during preparation
+      const ingredients = document.querySelectorAll(`#${station}Ingredients .ingredient`);
+      ingredients.forEach(ing => ing.classList.add('disabled'));
+
+      // Clear any existing interval
+      if (preparationInterval) {
+        clearInterval(preparationInterval);
+      }
+
+      preparationInterval = setInterval(() => {
+        preparationProgress += (100 / totalTime);
+        progressFill.style.width = `${Math.min(preparationProgress, 100)}%`;
+
+        if (preparationProgress >= 100) {
+          clearInterval(preparationInterval);
+          serveBtn.disabled = false;
+          ingredients.forEach(ing => ing.classList.remove('disabled'));
+        }
+      }, 100);
+    }
+
+    function calculateTip(customer, itemPrice, preparationTime) {
+      // Random tip percentage between 15% and 35%
+      const randomTipPercent = 0.15 + (Math.random() * 0.20);
+      const baseTip = itemPrice * randomTipPercent;
+      const timeBonus = Math.max(0, 1 - (preparationTime / 100)); // Bonus for quick service
+      const finalTip = baseTip * customer.tipMultiplier * (1 + timeBonus);
+      
+      // Return both the tip amount and whether it's a "good" tip (over 25%)
+      return {
+        amount: finalTip,
+        isGoodTip: randomTipPercent > 0.25
+      };
+    }
+
+    function getRandomTipMessage(isGoodTip) {
+      const messages = isGoodTip ? [
+        "Wow! Such a generous tip! 🎉",
+        "The customer is very pleased! 🌟",
+        "They really loved your service! 💫",
+        "What a kind rat! 🐀✨",
+        "Extra cheese for you! 🧀",
+        "They left a huge tip! 🎊"
+      ] : [
+        "A small tip for your service! 🐀",
+        "The customer left a tip! 💫",
+        "Thanks for the service! 🌟",
+        "A little extra for you! ✨"
+      ];
+      return messages[Math.floor(Math.random() * messages.length)];
+    }
+
+    function showTipMessage(tipAmount, isGoodTip) {
+      const message = document.createElement('div');
+      message.style.position = 'fixed';
+      message.style.top = '20px';
+      message.style.left = 'calc(50% + 120px)'; // Position to the right of the order message
+      message.style.transform = 'translateX(-50%)';
+      message.style.background = isGoodTip ? 'rgba(255, 215, 0, 0.9)' : 'rgba(107, 142, 61, 0.9)';
+      message.style.color = 'white';
+      message.style.padding = '1rem 2rem';
+      message.style.borderRadius = '8px';
+      message.style.fontWeight = 'bold';
+      message.style.zIndex = '1000';
+      message.style.textAlign = 'center';
+      message.style.boxShadow = isGoodTip ? '0 0 20px rgba(255, 215, 0, 0.5)' : '0 0 10px rgba(107, 142, 61, 0.5)';
+      message.style.minWidth = '200px'; // Ensure consistent width
+      
+      const tipText = document.createElement('div');
+      tipText.textContent = getRandomTipMessage(isGoodTip);
+      tipText.style.marginBottom = '0.5rem';
+      
+      const amountText = document.createElement('div');
+      amountText.textContent = `+$${tipAmount.toFixed(2)} tip!`;
+      amountText.style.fontSize = isGoodTip ? '1.2em' : '1em';
+      
+      message.appendChild(tipText);
+      message.appendChild(amountText);
+      document.body.appendChild(message);
+      
+      // Add a little bounce animation for good tips
+      if (isGoodTip) {
+        message.style.animation = 'bounce 0.5s ease';
+      }
+      
+      setTimeout(() => {
+        message.style.opacity = '0';
+        message.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => message.remove(), 500);
+      }, 2000);
+    }
+
+    function isCorrectOrder(customer, itemName, station) {
+      if (!customer || !itemName || !station) return false;
+
+      // For drinks
+      if (station === 'coffee') {
+        return customer.order.drink && 
+               customer.order.drink.name === itemName && 
+               !customer.order.drink.served;
+      }
+      // For snacks
+      else if (station === 'snack') {
+        // First check if it matches the first snack slot and it's not served
+        if (customer.order.snack && 
+            customer.order.snack.name === itemName && 
+            !customer.order.snack.served) {
+          return true;
+        }
+        // Then check if it matches the second snack slot and it's not served
+        if (customer.order.secondSnack && 
+            customer.order.secondSnack.name === itemName && 
+            !customer.order.secondSnack.served) {
+          return true;
+        }
+        return false;
+      }
+      return false;
+    }
+
+    function showRatingPenalty(amount) {
+      const message = document.createElement('div');
+      message.style.position = 'fixed';
+      message.style.top = '60px';
+      message.style.left = '50%';
+      message.style.transform = 'translateX(-50%)';
+      message.style.background = 'rgba(139, 0, 0, 0.9)';
+      message.style.color = 'white';
+      message.style.padding = '1rem 2rem';
+      message.style.borderRadius = '8px';
+      message.style.fontWeight = 'bold';
+      message.style.zIndex = '1000';
+      message.style.textAlign = 'center';
+      message.style.minWidth = '200px';
+      message.textContent = `Wrong order! -${amount.toFixed(1)} ⭐`;
+      document.body.appendChild(message);
+      
+      setTimeout(() => {
+        message.style.opacity = '0';
+        message.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => message.remove(), 500);
+      }, 2000);
+    }
+
+    function serveItem(station) {
+      if (station === 'coffee') {
+        if (!currentDrink) return;  // Need a drink to serve
+        
+        // If no customer is selected, show a message
+        if (!currentOrder) {
+          const message = document.createElement('div');
+          message.style.position = 'fixed';
+          message.style.top = '20px';
+          message.style.left = '50%';
+          message.style.transform = 'translateX(-50%)';
+          message.style.background = 'rgba(139, 0, 0, 0.9)';
+          message.style.color = 'white';
+          message.style.padding = '1rem 2rem';
+          message.style.borderRadius = '8px';
+          message.style.fontWeight = 'bold';
+          message.style.zIndex = '1000';
+          message.textContent = 'Select a customer to serve!';
+          document.body.appendChild(message);
+          
+          setTimeout(() => {
+            message.style.opacity = '0';
+            message.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => message.remove(), 500);
+          }, 2000);
+          return;
+        }
+        
+        // Create a temporary order item for the current drink
+        const orderItem = {
+          name: currentDrink.name,
+          price: currentDrink.price,
+          served: false
+        };
+        
+        // Check if this is the correct order
+        const isCorrect = isCorrectOrder(currentOrder, orderItem.name, station);
+        
+        // Calculate tip based on customer type and preparation time
+        const { amount: tip, isGoodTip } = calculateTip(currentOrder, orderItem.price, currentDrinkProgress);
+        
+        // Only add money and tip if the order is correct
+        if (isCorrect) {
+          money += orderItem.price + tip;
+        } else {
+          // Apply rating penalty for wrong order
+          const wrongOrderPenalty = 0.3;
+          updateRating(rating - wrongOrderPenalty);
+          showRatingPenalty(wrongOrderPenalty);
+        }
+        
+        // Mark item as served
+        currentOrder.order.drink = { ...orderItem, served: true };
+        
+        // Check if order is complete
+        const isOrderComplete = 
+          (!currentOrder.order.drink || currentOrder.order.drink.served) && 
+          (!currentOrder.order.snack || currentOrder.order.snack.served) &&
+          (!currentOrder.order.secondSnack || currentOrder.order.secondSnack.served);
+        
+        if (isOrderComplete) {
+          const allItemsCorrect = 
+            (!currentOrder.order.drink || isCorrectOrder(currentOrder, currentOrder.order.drink.name, 'coffee')) &&
+            (!currentOrder.order.snack || isCorrectOrder(currentOrder, currentOrder.order.snack.name, 'snack')) &&
+            (!currentOrder.order.secondSnack || isCorrectOrder(currentOrder, currentOrder.order.secondSnack.name, 'snack'));
+          
+          if (allItemsCorrect) {
+            dayCustomersServed++;
+            updateDayInfo();
+            
+            if (dayCustomersServed >= dayGoal) {
+              completeDay();
+            }
+          }
+          
+          customers = customers.filter(c => c.id !== currentOrder.id);
+          currentOrder = null;
+        }
+        
+        // Reset the coffee station
+        trashDrink('coffee');
+        updateGameInfo();
+        updateOrderDisplay();
+        
+        // Show completion messages
+        const message = document.createElement('div');
+        message.style.position = 'fixed';
+        message.style.top = '20px';
+        message.style.left = 'calc(50% - 120px)';
+        message.style.transform = 'translateX(-50%)';
+        message.style.background = isCorrect ? 'rgba(107, 142, 61, 0.9)' : 'rgba(139, 0, 0, 0.9)';
+        message.style.color = 'white';
+        message.style.padding = '1rem 2rem';
+        message.style.borderRadius = '8px';
+        message.style.fontWeight = 'bold';
+        message.style.zIndex = '1000';
+        message.style.textAlign = 'center';
+        message.style.minWidth = '200px';
+        
+        if (isCorrect) {
+          message.innerHTML = `
+            <div>Served! +$${orderItem.price.toFixed(2)}</div>
+            <div style="font-size: 0.9em; margin-top: 0.5rem;">Correct order!</div>
+          `;
+        } else {
+          message.innerHTML = `
+            <div>Wrong order! No payment</div>
+            <div style="font-size: 0.9em; margin-top: 0.5rem;">-0.3 ⭐ rating penalty</div>
+          `;
+        }
+        
+        document.body.appendChild(message);
+        
+        if (isCorrect) {
+          showTipMessage(tip, isGoodTip);
+        }
+        
+        setTimeout(() => {
+          message.style.opacity = '0';
+          message.style.transition = 'opacity 0.5s ease';
+          setTimeout(() => message.remove(), 500);
+        }, 1500);
+      } else {
+        // Existing snack serving logic remains unchanged
+        // ... existing snack serving code ...
+      }
+    }
+
+    function resetPreparation(station) {
+      const progressBar = document.getElementById(`${station}Progress`);
+      const progressFill = document.getElementById(`${station}ProgressFill`);
+      const makeBtn = document.getElementById(`make${station.charAt(0).toUpperCase() + station.slice(1)}Btn`);
+      const currentOrderEl = document.getElementById(`${station}Order`);
+      
+      if (preparationInterval) {
+        clearInterval(preparationInterval);
+        preparationInterval = null;
+      }
+      
+      preparationProgress = 0;
+      progressFill.style.width = '0%';
+      progressBar.classList.remove('active');
+      makeBtn.disabled = true;
+      selectedIngredients.clear();
+
+      // Reset ingredient selection
+      const ingredients = document.querySelectorAll(`#${station}Ingredients .ingredient`);
+      ingredients.forEach(ing => {
+        ing.classList.remove('selected', 'disabled');
+      });
+
+      // Clear order display
+      currentOrderEl.classList.remove('active');
+      currentOrderEl.innerHTML = '';
+    }
+
+    function selectCustomer(customerId) {
+      const customer = customers.find(c => c.id === customerId);
+      if (customer) {
+        currentOrder = customer;
+        
+        // Update the visual selection in the order queue
+        const customerElements = document.querySelectorAll('.customer');
+        customerElements.forEach(el => {
+          if (el.dataset.id === customerId.toString()) {
+            el.classList.add('selected');
+          } else {
+            el.classList.remove('selected');
+          }
+        });
+
+        // Enable serve buttons if we have prepared items
+        const serveCoffeeBtn = document.getElementById('serveCoffeeBtn');
+        const serveSnackBtn = document.getElementById('serveSnackBtn');
+        
+        if (serveCoffeeBtn) {
+          serveCoffeeBtn.disabled = !document.querySelector('#preparedDrinks .prepared-item');
+        }
+        if (serveSnackBtn) {
+          serveSnackBtn.disabled = !document.querySelector('#preparedSnacks .prepared-item');
+        }
+
+        // Show a brief highlight animation
+        const selectedEl = document.querySelector('.customer.selected');
+        if (selectedEl) {
+          selectedEl.style.animation = 'none';
+          selectedEl.offsetHeight; // Trigger reflow
+          selectedEl.style.animation = 'highlight 0.5s ease';
+        }
+      }
+    }
+
+    // Initialize game on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('startMenu').classList.remove('hidden');
+      document.getElementById('startGameBtn').addEventListener('click', startNewGame);
+      // Sound toggle button
+      const soundBtn = document.getElementById('soundToggleBtn');
+      if (soundBtn && bgMusic) {
+        let isMuted = false;
+        soundBtn.addEventListener('click', () => {
+          isMuted = !isMuted;
+          bgMusic.muted = isMuted;
+          soundBtn.textContent = isMuted ? '🔇 Sound Off' : '🔊 Sound On';
+        });
+        // Always hide sound button on start
+        soundBtn.style.display = 'none';
+      }
+    });
+
+    function startNewGame() {
+      console.log('Starting new game...');
+      
+      // Hide start menu
+      document.getElementById('startMenu').classList.add('hidden');
+      
+      // Reset game state with settings
+      day = GAME_SETTINGS.STARTING_DAY;
+      money = GAME_SETTINGS.STARTING_MONEY;
+      rating = GAME_SETTINGS.STARTING_RATING;
+      previousDayMoney = GAME_SETTINGS.STARTING_MONEY;
+      previousDayRating = GAME_SETTINGS.STARTING_RATING;
+      gameStarted = true;
+      
+      // Start first day
+      startNewDay();
+      
+      // Start music
+      bgMusic.volume = 0.3;
+      bgMusic.currentTime = 0;
+      bgMusic.play().catch(err => console.log('Music play error:', err));
+      
+      // Initialize preparation stations
+      initializePreparationStations();
+      
+      // Show sound button only during gameplay
+      const soundBtn = document.getElementById('soundToggleBtn');
+      if (soundBtn) soundBtn.style.display = 'block';
+    }
+
+    function updateGameInfo() {
+      document.getElementById('dayCount').textContent = day;
+      document.getElementById('moneyCount').textContent = money.toFixed(2);
+      document.getElementById('ratingCount').textContent = rating.toFixed(1);
+    }
+
+    // Add these variables at the start of your script
+    let customerSpawnInterval = null;
+    let previousDayMoney = 0;
+    let previousDayRating = 5;
+
+    // Add this variable at the top with other game state variables
+    let customerUpdateInterval = null;
+
+    function showGameOver() {
+      const gameOverScreen = document.createElement('div');
+      gameOverScreen.className = 'start-menu';
+      gameOverScreen.innerHTML = `
+        <div class="start-content">
+          <h2>Game Over! 😢</h2>
+          <div class="start-instructions">
+            <div style="margin-bottom: 1rem;">
+              <strong>Final Stats:</strong><br>
+              Days Survived: ${day}<br>
+              Total Earnings: $${money.toFixed(2)}<br>
+              Final Rating: ${rating.toFixed(1)} ⭐
+            </div>
+            <div style="margin-bottom: 1rem;">
+              <em>The rats have left bad reviews...</em><br>
+              <em>Your cafe has closed its doors.</em>
+            </div>
+          </div>
+          <button class="start-btn" id="restartGameBtn">Try Again</button>
+        </div>
+      `;
+      
+      document.body.appendChild(gameOverScreen);
+      
+      // Add click handler for restart button
+      document.getElementById('restartGameBtn').addEventListener('click', () => {
+        gameOverScreen.remove();
+        startNewGame();
+      });
+      
+      // Hide sound button on game over
+      const soundBtn = document.getElementById('soundToggleBtn');
+      if (soundBtn) soundBtn.style.display = 'none';
+    }
+
+    function completeDay() {
+      isDayActive = false;
+      dayEndTime = Date.now();
+      
+      // Calculate day stats
+      const dayDuration = (dayEndTime - dayStartTime) / 1000; // in seconds
+      const dayEarnings = money - (day === 1 ? 0 : previousDayMoney);
+      
+      // Add rating bonus for completing the day
+      const oldRating = rating;
+      updateRating(rating + 0.5); // This will cap at 5.0
+      const ratingGained = rating - oldRating;
+      
+      // Store current values for next day comparison
+      previousDayMoney = money;
+      previousDayRating = rating;
+      
+      // Show day completion screen
+      const completionScreen = document.createElement('div');
+      completionScreen.className = 'start-menu';
+      completionScreen.innerHTML = `
+        <div class="start-content">
+          <h2>Day ${day} Complete! 🎉</h2>
+          <div class="start-instructions">
+            <div style="margin-bottom: 1rem;">
+              <strong>Day Stats:</strong><br>
+              Customers Served: ${dayCustomersServed}/${dayGoal}<br>
+              Time: ${Math.floor(dayDuration / 60)}m ${Math.floor(dayDuration % 60)}s<br>
+              Earnings: +$${dayEarnings.toFixed(2)}<br>
+              Rating: ${oldRating.toFixed(1)} → ${rating.toFixed(1)} ⭐
+              ${ratingGained > 0 ? `<br><span style="color: #6B8E3D;">+${ratingGained.toFixed(1)} stars for completing the day!</span>` : ''}
+              ${rating >= 5.0 ? '<br><span style="color: #8B6914;">⭐ Maximum rating reached! ⭐</span>' : ''}
+            </div>
+            <div style="margin-bottom: 1rem;">
+              <strong>Next Day:</strong><br>
+              Goal: ${DAY_SETTINGS.getDayGoal(day + 1)} customers<br>
+              Max Customers: ${DAY_SETTINGS.getMaxCustomers(day + 1)}<br>
+              Customer Patience: ${Math.floor(DAY_SETTINGS.getCustomerPatience(day + 1, 60))}s
+            </div>
+            <div style="color: ${rating < 3 ? 'var(--accent-dark)' : 'inherit'};">
+              ${rating < 3 ? '⚠️ Warning: Low rating! Be careful!' : 'Ready for the next day?'}
+            </div>
+          </div>
+          <button class="start-btn" id="nextDayBtn">Start Day ${day + 1}</button>
+        </div>
+      `;
+      
+      document.body.appendChild(completionScreen);
+      
+      // Add click handler for next day button
+      document.getElementById('nextDayBtn').addEventListener('click', () => {
+        day++;
+        completionScreen.remove();
+        startNewDay();
+      });
+      
+      // Hide sound button on day complete
+      const soundBtn = document.getElementById('soundToggleBtn');
+      if (soundBtn) soundBtn.style.display = 'none';
+    }
+
+    // Add this helper function near the top with other utility functions
+    function updateRating(newRating) {
+      // Ensure rating stays between 0 and 5
+      rating = Math.max(0, Math.min(5.0, newRating));
+      updateGameInfo();
+      
+      // Check for game over if rating hits 0
+      if (rating <= 0) {
+        showGameOver();
+      }
+    }
+
+    function makeDrink(station) {
+      if (station !== 'coffee' || !selectedIngredients.size) return;
+
+      const drink = getDrinkFromIngredients(Array.from(selectedIngredients));
+      if (!drink) return;
+      
+      // Show progress bar and disable make button
+      const progressBar = document.getElementById(`${station}Progress`);
+      const progressFill = document.getElementById(`${station}ProgressFill`);
+      const makeBtn = document.getElementById(`make${station.charAt(0).toUpperCase() + station.slice(1)}Btn`);
+      
+      progressBar.classList.add('active');
+      makeBtn.disabled = true;
+      
+      // Disable all ingredients during preparation
+      const ingredients = document.querySelectorAll(`#${station}Ingredients .ingredient`);
+      ingredients.forEach(ing => ing.classList.add('disabled'));
+
+      // Start preparation timer
+      let progress = 0;
+      const totalTime = drink.time;
+
+      const interval = setInterval(() => {
+        progress += (100 / totalTime);
+        progressFill.style.width = `${Math.min(progress, 100)}%`;
+
+        if (progress >= 100) {
+          clearInterval(interval);
+          ingredients.forEach(ing => ing.classList.remove('disabled'));
+          makeBtn.disabled = false;
+          
+          // Add the prepared drink to the prepared items area
+          addPreparedItem('coffee', { ...drink, type: 'coffee' });
+          
+          // Reset the preparation area
+          resetPreparation(station);
+        }
+      }, 100);
+    }
+
+    function trashDrink(station) {
+      if (station !== 'coffee') return;
+      
+      // Reset everything
+      const progressBar = document.getElementById(`${station}Progress`);
+      const progressFill = document.getElementById(`${station}ProgressFill`);
+      const makeBtn = document.getElementById(`make${station.charAt(0).toUpperCase() + station.slice(1)}Btn`);
+      const serveBtn = document.getElementById(`serve${station.charAt(0).toUpperCase() + station.slice(1)}Btn`);
+      const trashBtn = document.getElementById(`trash${station.charAt(0).toUpperCase() + station.slice(1)}Btn`);
+      const currentOrderEl = document.getElementById(`${station}Order`);
+      
+      if (currentDrinkInterval) {
+        clearInterval(currentDrinkInterval);
+      }
+      
+      currentDrink = null;
+      currentDrinkProgress = 0;
+      progressFill.style.width = '0%';
+      progressBar.classList.remove('active');
+      
+      // Reset buttons
+      makeBtn.style.display = 'block';
+      makeBtn.disabled = false;
+      serveBtn.style.display = 'none';
+      trashBtn.style.display = 'none';
+      
+      // Reset ingredients
+      selectedIngredients.clear();
+      const ingredients = document.querySelectorAll(`#${station}Ingredients .ingredient`);
+      ingredients.forEach(ing => {
+        ing.classList.remove('selected', 'disabled');
+      });
+      
+      // Clear order display
+      currentOrderEl.classList.remove('active');
+      currentOrderEl.innerHTML = '';
+    }
+
+    // Add these functions back after the RECIPE_TIMES
+    function getRandomCustomerType() {
+      const totalWeight = Object.values(CUSTOMER_TYPES).reduce((sum, type) => sum + type.spawnWeight, 0);
+      let random = Math.random() * totalWeight;
+      
+      for (const [type, data] of Object.entries(CUSTOMER_TYPES)) {
+        random -= data.spawnWeight;
+        if (random <= 0) return type;
+      }
+      
+      return 'normal'; // Fallback
+    }
+
+    function startNewDay() {
+      dayStartTime = Date.now();
+      isDayActive = true;
+      dayProgress = 0;
+      dayCustomersServed = 0;
+      
+      // Restore day goal logic
+      dayGoal = DAY_SETTINGS.getDayGoal(day);
+      dayCustomerSpawnRate = DAY_SETTINGS.getCustomerSpawnRate(day);
+      dayMaxCustomers = DAY_SETTINGS.getMaxCustomers(day);
+      
+      // Clear any existing customers
+      customers = [];
+      currentOrder = null;
+      
+      // Update UI
+      updateDayInfo();
+      updateGameInfo();
+      
+      // Start customer spawn timer with day-specific rate
+      if (customerSpawnInterval) {
+        clearInterval(customerSpawnInterval);
+      }
+      customerSpawnInterval = setInterval(() => {
+        if (customers.length < dayMaxCustomers && Math.random() < 0.7) {
+          createCustomer();
+        }
+      }, dayCustomerSpawnRate);
+      
+      // Start customer update timer - update every 500ms instead of 1000ms
+      if (customerUpdateInterval) {
+        clearInterval(customerUpdateInterval);
+      }
+      customerUpdateInterval = setInterval(updateCustomers, 500);
+      
+      // Create first customer immediately
+      createCustomer();
+    }
+
+    function updateDayInfo() {
+      // Show current day and customers served out of goal
+      const dayInfo = document.getElementById('dayInfo');
+      if (!dayInfo) {
+        const gameInfo = document.querySelector('.game-info');
+        const newDayInfo = document.createElement('div');
+        newDayInfo.id = 'dayInfo';
+        newDayInfo.style.marginTop = '0.5rem';
+        newDayInfo.style.fontSize = '1.1rem';
+        newDayInfo.style.color = 'var(--accent-dark)';
+        gameInfo.appendChild(newDayInfo);
+      }
+      document.getElementById('dayInfo').textContent = 
+        `Day ${day} Goal: ${dayCustomersServed}/${dayGoal} customers served`;
+    }
+
+    function createCustomer() {
+      const type = getRandomCustomerType();
+      const customerType = CUSTOMER_TYPES[type];
+      
+      // Adjust customer patience based on day
+      const adjustedPatience = DAY_SETTINGS.getCustomerPatience(day, customerType.patience);
+      
+      // Generate orders with day-appropriate complexity
+      let drink = null;
+      let snack = null;
+      let secondSnack = null;
+      
+      // Chance for drink based on day
+      if (Math.random() < DAY_SETTINGS.getDrinkChance(day)) {
+        // Check for experimental drink order
+        const experimentalMultiplier = DAY_SETTINGS.getExperimentalChance(day);
+        const wantsExperimental = Math.random() < (customerType.experimentalChance * experimentalMultiplier);
+        
+        if (wantsExperimental) {
+          // Pick a random experimental drink
+          drink = EXPERIMENTAL_DRINKS[Math.floor(Math.random() * EXPERIMENTAL_DRINKS.length)];
+          // Add a special status for experimental orders
+          customerType.status = type === 'goblin' ? "I want something CHAOTIC!" : 
+                              type === 'eepy' ? "Something... different..." :
+                              "I'm feeling adventurous!";
+        } else {
+          // Regular drink order logic
+          if (day === 1) {
+            const simpleDrinks = MENU_ITEMS.drinks.filter(d => 
+              d.ingredients.length <= 2 && 
+              !d.ingredients.includes('ice') && 
+              !d.ingredients.includes('whippedCream')
+            );
+            drink = simpleDrinks[Math.floor(Math.random() * simpleDrinks.length)];
+          } else {
+            drink = MENU_ITEMS.drinks[Math.floor(Math.random() * MENU_ITEMS.drinks.length)];
+          }
+        }
+      }
+      
+      // Chance for snack based on day
+      if (Math.random() < DAY_SETTINGS.getSnackChance(day)) {
+        snack = MENU_ITEMS.snacks[Math.floor(Math.random() * MENU_ITEMS.snacks.length)];
+        
+        // Only add second snack if we're past day 1 and roll for multi-item
+        if (day > 1 && snack && Math.random() < DAY_SETTINGS.getMultiItemChance(day)) {
+          let availableSnacks = MENU_ITEMS.snacks.filter(s => s.name !== snack.name);
+          if (availableSnacks.length > 0) {
+            secondSnack = availableSnacks[Math.floor(Math.random() * availableSnacks.length)];
+          }
+        }
+      }
+      
+      // Ensure customer has at least one item
+      if (!drink && !snack && !secondSnack) {
+        // Default to a simple drink on day 1
+        if (day === 1) {
+          const simpleDrinks = MENU_ITEMS.drinks.filter(d => d.ingredients.length <= 2);
+          drink = simpleDrinks[Math.floor(Math.random() * simpleDrinks.length)];
+        } else {
+          drink = MENU_ITEMS.drinks[Math.floor(Math.random() * MENU_ITEMS.drinks.length)];
+        }
+      }
+      
+      const customer = {
+        id: currentCustomerId++,
+        type: type,
+        name: customerType.name,
+        avatar: customerType.avatar,
+        status: customerType.status,
+        patience: adjustedPatience,
+        currentPatience: adjustedPatience,
+        tipMultiplier: customerType.tipMultiplier,
+        order: {
+          drink: drink ? { ...drink, served: false } : null,
+          snack: snack ? { ...snack, served: false } : null,
+          secondSnack: secondSnack ? { ...secondSnack, served: false } : null
+        },
+        totalPrice: (drink ? drink.price : 0) + 
+                   (snack ? snack.price : 0) + 
+                   (secondSnack ? secondSnack.price : 0),
+        timeInQueue: 0
+      };
+      
+      customers.push(customer);
+      updateOrderDisplay();
+    }
+
+    function getItemDisplay(item, station) {
+      if (!item) return '';
+      const status = item.served ? '✓' : '';  // Just show checkmark when served
+      const color = item.served ? 'color: #6B8E3D;' : '';  // Always show green when served
+      return `<span style="${color}">${status} ${item.name}</span>`;
+    }
+
+    function updateOrderDisplay() {
+      const orderStation = document.getElementById('orderStation');
+      orderStation.innerHTML = '';
+      
+      customers.forEach(customer => {
+        const customerEl = document.createElement('div');
+        customerEl.className = `customer ${customer.type}`;
+        customerEl.dataset.id = customer.id;
+        
+        // Add visual indicator for served items and their correctness
+        const drinkDisplay = customer.order.drink ? getItemDisplay(customer.order.drink, 'coffee') : '';
+        const snackDisplay = customer.order.snack ? getItemDisplay(customer.order.snack, 'snack') : '';
+        const secondSnackDisplay = customer.order.secondSnack ? getItemDisplay(customer.order.secondSnack, 'snack') : '';
+        
+        // Update customer status based on served items
+        let statusColor = 'var(--txt)';
+        
+        if (customer.order.drink?.served || customer.order.snack?.served || customer.order.secondSnack?.served) {
+          // Check if all served items were correct
+          const allItemsCorrect = 
+            (!customer.order.drink || (customer.order.drink.served && isCorrectOrder(customer, customer.order.drink.name, 'coffee'))) &&
+            (!customer.order.snack || (customer.order.snack.served && isCorrectOrder(customer, customer.order.snack.name, 'snack'))) &&
+            (!customer.order.secondSnack || (customer.order.secondSnack.served && isCorrectOrder(customer, customer.order.secondSnack.name, 'snack')));
+          
+          statusColor = allItemsCorrect ? '#6B8E3D' : '#8B0000';
+        }
+        
+        customerEl.innerHTML = `
+          <div class="customer-avatar">
+            <img src="${customer.avatar}" alt="${customer.name}">
+          </div>
+          <div class="customer-info">
+            <div class="customer-name">${customer.name}</div>
+            <div class="customer-order">
+              ${drinkDisplay}
+              ${snackDisplay ? ` + ${snackDisplay}` : ''}
+              ${secondSnackDisplay ? ` + ${secondSnackDisplay}` : ''}
+            </div>
+            <div class="patience-bar">
+              <div class="patience-fill" style="width: ${(customer.currentPatience / customer.patience) * 100}%"></div>
+            </div>
+          </div>
+          <div class="customer-timer">$${customer.totalPrice.toFixed(2)}</div>
+          <div class="customer-status" style="color: ${statusColor}">${customer.status}</div>
+        `;
+        
+        // Add click handler for customer selection
+        customerEl.addEventListener('click', () => selectCustomer(customer.id));
+        
+        orderStation.appendChild(customerEl);
+      });
+
+      // Reinitialize drag and drop for new customers
+      initializeDragAndDrop();
+    }
+
+    function updateCustomers() {
+      const now = Date.now();
+      let needsUpdate = false;
+      
+      customers = customers.filter(customer => {
+        customer.timeInQueue += 1;
+        customer.currentPatience -= 1;
+        
+        if (customer.currentPatience <= 0) {
+          // Customer leaves unhappy - apply customer-specific rating penalty
+          const customerType = CUSTOMER_TYPES[customer.type];
+          updateRating(rating - customerType.ratingPenalty);
+          
+          // Show rating penalty message
+          requestAnimationFrame(() => {
+            const message = document.createElement('div');
+            message.style.position = 'fixed';
+            message.style.top = '20px';
+            message.style.left = '50%';
+            message.style.transform = 'translateX(-50%)';
+            message.style.background = 'rgba(139, 0, 0, 0.9)';
+            message.style.color = 'white';
+            message.style.padding = '1rem 2rem';
+            message.style.borderRadius = '8px';
+            message.style.fontWeight = 'bold';
+            message.style.zIndex = '1000';
+            message.textContent = `${customer.name} left unhappy! -${customerType.ratingPenalty.toFixed(1)} ⭐`;
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+              message.style.opacity = '0';
+              message.style.transition = 'opacity 0.5s ease';
+              setTimeout(() => message.remove(), 500);
+            }, 2000);
+          });
+          
+          needsUpdate = true;
+          return false;
+        }
+        return true;
+      });
+      
+      // Only update display if customers changed
+      if (needsUpdate) {
+        updateOrderDisplay();
+      } else {
+        // Just update patience bars
+        customers.forEach(customer => {
+          const customerEl = document.querySelector(`.customer[data-id="${customer.id}"] .patience-fill`);
+          if (customerEl) {
+            customerEl.style.width = `${(customer.currentPatience / customer.patience) * 100}%`;
+          }
+        });
+      }
+    }
+
+    function initializeOrderSystem() {
+      // Start customer spawn timer with more frequent spawns
+      setInterval(() => {
+        if (customers.length < 5 && Math.random() < 0.4) { // Increased spawn chance
+          createCustomer();
+        }
+      }, 4000); // Reduced spawn interval
+      
+      // Start customer update timer
+      setInterval(updateCustomers, 1000);
+      
+      // Create first customer immediately
+      createCustomer();
+      
+      // Create second customer after a short delay
+      setTimeout(createCustomer, 2000);
+    }
+
+    function initializePreparationStations() {
+      const coffeeStation = document.getElementById('coffeeStation');
+      const snackStation = document.getElementById('snackStation');
+
+      // Coffee station setup
+      coffeeStation.innerHTML = `
+        <div class="station-header">Coffee Station</div>
+        <div class="current-order" id="coffeeOrder"></div>
+        <div class="preparation-area" id="coffeeIngredients"></div>
+        <div class="preparation-progress" id="coffeeProgress">
+          <div class="progress-fill" id="coffeeProgressFill"></div>
+        </div>
+        <button class="serve-btn" id="makeCoffeeBtn" disabled>Make Drink</button>
+        <div class="prepared-items-area">
+          <div class="prepared-items-title">Prepared Drinks</div>
+          <div id="preparedDrinks"></div>
+        </div>
+        <button class="serve-btn" id="serveCoffeeBtn" style="display: none;">Serve Drink</button>
+      `;
+
+      // Snack station setup
+      snackStation.innerHTML = `
+        <div class="station-header">Snack Station</div>
+        <div class="current-order" id="snackOrder"></div>
+        <div class="preparation-area" id="snackIngredients"></div>
+        <div class="preparation-progress" id="snackProgress">
+          <div class="progress-fill" id="snackProgressFill"></div>
+        </div>
+        <button class="serve-btn" id="makeSnackBtn" disabled>Prepare Snack</button>
+        <div class="prepared-items-area">
+          <div class="prepared-items-title">Prepared Snacks</div>
+          <div id="preparedSnacks"></div>
+        </div>
+        <button class="serve-btn" id="serveSnackBtn" style="display: none;">Serve Snack</button>
+      `;
+
+      // Add coffee ingredients
+      const coffeeIngredients = document.getElementById('coffeeIngredients');
+      Object.entries(COFFEE_INGREDIENTS).forEach(([id, ingredient]) => {
+        const el = document.createElement('div');
+        el.className = 'ingredient';
+        el.textContent = ingredient.name;
+        el.dataset.id = id;
+        el.dataset.time = ingredient.time;
+        el.addEventListener('click', () => toggleIngredient('coffee', id, el));
+        coffeeIngredients.appendChild(el);
+      });
+
+      // Add snack ingredients
+      const snackIngredients = document.getElementById('snackIngredients');
+      Object.entries(SNACK_INGREDIENTS).forEach(([id, ingredient]) => {
+        const el = document.createElement('div');
+        el.className = 'ingredient';
+        el.textContent = ingredient.name;
+        el.dataset.id = id;
+        el.dataset.time = ingredient.time;
+        el.addEventListener('click', () => toggleIngredient('snack', id, el));
+        snackIngredients.appendChild(el);
+      });
+
+      // Add button handlers
+      const makeCoffeeBtn = document.getElementById('makeCoffeeBtn');
+      const makeSnackBtn = document.getElementById('makeSnackBtn');
+      const serveCoffeeBtn = document.getElementById('serveCoffeeBtn');
+      const serveSnackBtn = document.getElementById('serveSnackBtn');
+      
+      if (makeCoffeeBtn) {
+        makeCoffeeBtn.addEventListener('click', () => makeDrink('coffee'));
+      }
+      if (makeSnackBtn) {
+        makeSnackBtn.addEventListener('click', () => makeSnack('snack'));
+      }
+
+      // Initialize drag and drop
+      initializeDragAndDrop();
+    }
+
+    function initializeDragAndDrop() {
+      // Make customers droppable
+      const customers = document.querySelectorAll('.customer');
+      customers.forEach(customer => {
+        customer.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          const itemData = JSON.parse(e.dataTransfer.getData('text/plain'));
+          // Only show drag-over effect if the item type matches an unserved order
+          if ((itemData.type === 'coffee' && customer.order.drink && !customer.order.drink.served) ||
+              (itemData.type === 'snack' && 
+               ((customer.order.snack && !customer.order.snack.served) || 
+                (customer.order.secondSnack && !customer.order.secondSnack.served)))) {
+            customer.classList.add('drag-over');
+          }
+        });
+
+        customer.addEventListener('dragleave', (e) => {
+          customer.classList.remove('drag-over');
+        });
+
+        customer.addEventListener('drop', (e) => {
+          e.preventDefault();
+          customer.classList.remove('drag-over');
+          
+          const itemData = JSON.parse(e.dataTransfer.getData('text/plain'));
+          const customerId = parseInt(customer.dataset.id);
+          serveItemToCustomer(itemData, customerId);
+        });
+      });
+    }
+
+    function makeSnack(station) {
+      if (station !== 'snack' || !selectedIngredients.size) return;
+
+      const snack = getSnackFromIngredients(Array.from(selectedIngredients));
+      if (!snack) return;
+
+      // Show progress bar and disable make button
+      const progressBar = document.getElementById(`${station}Progress`);
+      const progressFill = document.getElementById(`${station}ProgressFill`);
+      const makeBtn = document.getElementById(`make${station.charAt(0).toUpperCase() + station.slice(1)}Btn`);
+      
+      progressBar.classList.add('active');
+      makeBtn.disabled = true;
+      
+      // Disable all ingredients during preparation
+      const ingredients = document.querySelectorAll(`#${station}Ingredients .ingredient`);
+      ingredients.forEach(ing => ing.classList.add('disabled'));
+
+      // Start preparation timer
+      let progress = 0;
+      const totalTime = Array.from(selectedIngredients).reduce((total, ing) => {
+        return total + SNACK_INGREDIENTS[ing].time;
+      }, 0);
+
+      const interval = setInterval(() => {
+        progress += (100 / totalTime);
+        progressFill.style.width = `${Math.min(progress, 100)}%`;
+
+        if (progress >= 100) {
+          clearInterval(interval);
+          ingredients.forEach(ing => ing.classList.remove('disabled'));
+          makeBtn.disabled = false;
+          
+          // Add the prepared snack to the prepared items area
+          addPreparedItem('snack', snack);
+          
+          // Reset the preparation area
+          resetPreparation(station);
+        }
+      }, 100);
+    }
+
+    function getSnackFromIngredients(ingredients) {
+      // For snacks, we only expect a single ingredient
+      if (ingredients.length !== 1) return null;
+      
+      const ingredient = ingredients[0];
+      // Find the matching snack
+      for (const snack of MENU_ITEMS.snacks) {
+        if (snack.ingredients.includes(ingredient)) {
+          return {
+            name: snack.name,
+            price: snack.price,
+            time: snack.time,
+            type: 'snack'
+          };
+        }
+      }
+      
+      return null;
+    }
+
+    function addPreparedItem(type, item) {
+      const container = document.getElementById(`prepared${type === 'coffee' ? 'Drinks' : 'Snacks'}`);
+      const itemEl = document.createElement('div');
+      itemEl.className = 'prepared-item';
+      itemEl.draggable = true;
+      itemEl.dataset.item = JSON.stringify(item);
+      
+      itemEl.innerHTML = `
+        <div class="item-name">${item.name}</div>
+        <div class="item-price">$${item.price.toFixed(2)}</div>
+        <button class="trash-btn" onclick="trashPreparedItem(this)">×</button>
+      `;
+
+      // Add drag events
+      itemEl.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', JSON.stringify({...item, type}));
+        itemEl.classList.add('dragging');
+      });
+
+      itemEl.addEventListener('dragend', () => {
+        itemEl.classList.remove('dragging');
+      });
+
+      container.appendChild(itemEl);
+    }
+
+    function trashPreparedItem(button) {
+      const itemEl = button.parentElement;
+      itemEl.remove();
+    }
+
+    function serveItemToCustomer(item, customerId) {
+      const customer = customers.find(c => c.id === customerId);
+      if (!customer) return;
+
+      // Check if this is the correct order
+      const isCorrect = isCorrectOrder(customer, item.name, item.type);
+      
+      // Calculate tip based on customer type and preparation time
+      const { amount: tip, isGoodTip } = calculateTip(customer, item.price, 0);
+      
+      // Only add money and tip if the order is correct
+      if (isCorrect) {
+        money += item.price + tip;
+        
+        // Mark the correct item as served
+        if (item.type === 'coffee') {
+          if (customer.order.drink && customer.order.drink.name === item.name) {
+            customer.order.drink.served = true;
+          }
+        } else {
+          // For snacks, find the matching snack slot that hasn't been served yet
+          if (customer.order.snack && 
+              customer.order.snack.name === item.name && 
+              !customer.order.snack.served) {
+            customer.order.snack.served = true;
+          } else if (customer.order.secondSnack && 
+                     customer.order.secondSnack.name === item.name && 
+                     !customer.order.secondSnack.served) {
+            customer.order.secondSnack.served = true;
+          }
+        }
+
+        // Patience boost: increase currentPatience by 10% of original patience, up to max
+        const patienceBoost = Math.floor(customer.patience * 0.10);
+        customer.currentPatience = Math.min(customer.currentPatience + patienceBoost, customer.patience);
+      } else {
+        // Apply rating penalty for wrong order
+        const wrongOrderPenalty = 0.3;
+        updateRating(rating - wrongOrderPenalty);
+        showRatingPenalty(wrongOrderPenalty);
+      }
+      
+      // Check if order is complete
+      const isOrderComplete = 
+        (!customer.order.drink || customer.order.drink.served) && 
+        (!customer.order.snack || customer.order.snack.served) &&
+        (!customer.order.secondSnack || customer.order.secondSnack.served);
+      
+      if (isOrderComplete) {
+        // Check if all served items were correct
+        const allItemsCorrect = 
+          (!customer.order.drink || (customer.order.drink.served && customer.order.drink.name === customer.order.drink.name)) &&
+          (!customer.order.snack || (customer.order.snack.served && customer.order.snack.name === customer.order.snack.name)) &&
+          (!customer.order.secondSnack || (customer.order.secondSnack.served && customer.order.secondSnack.name === customer.order.secondSnack.name));
+        
+        // Only increment served counter if ALL items were served correctly
+        if (allItemsCorrect && isCorrect) {
+          dayCustomersServed++;
+          updateDayInfo();
+          
+          // Show happy customer message
+          const message = document.createElement('div');
+          message.style.position = 'fixed';
+          message.style.top = '60px';
+          message.style.left = '50%';
+          message.style.transform = 'translateX(-50%)';
+          message.style.background = 'rgba(107, 142, 61, 0.9)';
+          message.style.color = 'white';
+          message.style.padding = '1rem 2rem';
+          message.style.borderRadius = '8px';
+          message.style.fontWeight = 'bold';
+          message.style.zIndex = '1000';
+          message.style.textAlign = 'center';
+          message.innerHTML = `Customer satisfied! (${dayCustomersServed}/${dayGoal})`;
+          document.body.appendChild(message);
+          
+          setTimeout(() => {
+            message.style.opacity = '0';
+            message.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => message.remove(), 500);
+          }, 2000);
+          
+          // Check for day completion
+          const shouldCompleteDay = dayCustomersServed >= dayGoal;
+          
+          // Remove customer immediately
+          customers = customers.filter(c => c.id !== customer.id);
+          currentOrder = null;
+          
+          // Complete day after customer is removed if needed
+          if (shouldCompleteDay) {
+            setTimeout(() => completeDay(), 500);
+          }
+        } else {
+          // Customer leaves unhappy - apply rating penalty
+          const wrongOrderPenalty = 0.2;  // Smaller penalty for partial correctness
+          updateRating(rating - wrongOrderPenalty);
+          
+          // Show unhappy customer message
+          const message = document.createElement('div');
+          message.style.position = 'fixed';
+          message.style.top = '60px';
+          message.style.left = '50%';
+          message.style.transform = 'translateX(-50%)';
+          message.style.background = 'rgba(139, 0, 0, 0.9)';
+          message.style.color = 'white';
+          message.style.padding = '1rem 2rem';
+          message.style.borderRadius = '8px';
+          message.style.fontWeight = 'bold';
+          message.style.zIndex = '1000';
+          message.style.textAlign = 'center';
+          message.innerHTML = `Customer left unhappy! Wrong items served!`;
+          document.body.appendChild(message);
+          
+          setTimeout(() => {
+            message.style.opacity = '0';
+            message.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => message.remove(), 500);
+          }, 2000);
+          
+          // Remove customer immediately
+          customers = customers.filter(c => c.id !== customer.id);
+          currentOrder = null;
+        }
+      }
+      
+      // Remove the served item immediately
+      const itemEl = document.querySelector(`.prepared-item[data-item*="${item.name}"]`);
+      if (itemEl) {
+        itemEl.remove();
+      }
+      
+      // Update UI immediately
+      updateGameInfo();
+      updateOrderDisplay();
+      
+      // Show messages after UI is updated
+      requestAnimationFrame(() => {
+        showServingMessage(item, isCorrect, tip, isGoodTip);
+      });
+    }
+
+    function showServingMessage(item, isCorrect, tip, isGoodTip) {
+      const message = document.createElement('div');
+      message.style.position = 'fixed';
+      message.style.top = '20px';
+      message.style.left = 'calc(50% - 120px)';
+      message.style.transform = 'translateX(-50%)';
+      message.style.background = isCorrect ? 'rgba(107, 142, 61, 0.9)' : 'rgba(139, 0, 0, 0.9)';
+      message.style.color = 'white';
+      message.style.padding = '1rem 2rem';
+      message.style.borderRadius = '8px';
+      message.style.fontWeight = 'bold';
+      message.style.zIndex = '1000';
+      message.style.textAlign = 'center';
+      message.style.minWidth = '200px';
+      
+      if (isCorrect) {
+        message.innerHTML = `
+          <div>Served! +$${item.price.toFixed(2)}</div>
+          <div style="font-size: 0.9em; margin-top: 0.5rem;">Correct order!</div>
+        `;
+      } else {
+        message.innerHTML = `
+          <div>Wrong order! No payment</div>
+          <div style="font-size: 0.9em; margin-top: 0.5rem;">-0.3 ⭐ rating penalty</div>
+        `;
+      }
+      
+      document.body.appendChild(message);
+      
+      if (isCorrect) {
+        showTipMessage(tip, isGoodTip);
+      }
+      
+      setTimeout(() => {
+        message.style.opacity = '0';
+        message.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => message.remove(), 500);
+      }, 2000);
+    }
+
+    function getRecipeSheetText() {
+      let text = '';
+      text += 'Drinks:\n';
+      for (const drink of MENU_ITEMS.drinks) {
+        text += `- ${drink.name}: ${drink.ingredients.map(i => COFFEE_INGREDIENTS[i]?.name || i).join(', ')}\n`;
+      }
+      text += '\nSnacks:\n';
+      for (const snack of MENU_ITEMS.snacks) {
+        text += `- ${snack.name}: ${snack.ingredients.map(i => SNACK_INGREDIENTS[i]?.name || i).join(', ')}\n`;
+      }
+      text += '\nExperimental Drinks:\n';
+      for (const drink of EXPERIMENTAL_DRINKS) {
+        text += `- ${drink.name}: ${drink.ingredients.map(i => COFFEE_INGREDIENTS[i]?.name || i).join(', ')}\n`;
+      }
+      return text;
+    }
+
+    // Add event listeners for recipe sheet
+    window.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('recipeSheetBtn');
+      const overlay = document.getElementById('recipeSheetOverlay');
+      const paper = document.getElementById('recipeSheetPaper');
+      const content = document.getElementById('recipeSheetContent');
+      if (btn && overlay && paper && content) {
+        btn.addEventListener('click', () => {
+          content.textContent = getRecipeSheetText();
+          overlay.style.display = 'block';
+          overlay.style.background = 'rgba(60,40,20,0.18)'; // Reset overlay background
+        });
+        overlay.addEventListener('click', () => {
+          overlay.style.display = 'none';
+          overlay.style.background = 'rgba(60,40,20,0.18)'; // Ensure background is reset
+        });
+        paper.addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
+      }
+    });
+  </script>
+</body>
+</html> 
