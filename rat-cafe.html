@@ -1594,6 +1594,20 @@
       isDayActive = false;
       dayEndTime = Date.now();
       
+      // Clear all remaining customers to prevent rating penalties
+      customers = [];
+      currentOrder = null;
+      
+      // Stop customer spawn and update intervals
+      if (customerSpawnInterval) {
+        clearInterval(customerSpawnInterval);
+        customerSpawnInterval = null;
+      }
+      if (customerUpdateInterval) {
+        clearInterval(customerUpdateInterval);
+        customerUpdateInterval = null;
+      }
+      
       // Calculate day stats
       const dayDuration = (dayEndTime - dayStartTime) / 1000; // in seconds
       const dayEarnings = money - (day === 1 ? 0 : previousDayMoney);
@@ -1649,6 +1663,9 @@
       // Hide sound button on day complete
       const soundBtn = document.getElementById('soundToggleBtn');
       if (soundBtn) soundBtn.style.display = 'none';
+      
+      // Update the order display to clear any remaining customers
+      updateOrderDisplay();
     }
 
     // Add this helper function near the top with other utility functions
