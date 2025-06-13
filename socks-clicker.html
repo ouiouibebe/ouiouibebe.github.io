@@ -323,9 +323,22 @@
       <div id="finalScore"></div>
       <div id="highScore"></div>
       <div class="character-select">
-        <button class="character-btn" data-char="🐱">Socks</button>
-        <button class="character-btn" data-char="🐰">Ping</button>
-        <button class="character-btn" data-char="👸">RIRI</button>
+        <button class="character-btn" data-char="🐱" data-name="Socks">
+          <img class="char-image" src="socks.png" alt="Socks" style="margin-top: 4px;">
+          <span class="char-name">Socks</span>
+        </button>
+        <button class="character-btn" data-char="🐰" data-name="Ping">
+          <img class="char-image" src="ping.png" alt="Ping">
+          <span class="char-name">Ping</span>
+        </button>
+        <button class="character-btn" data-char="👸" data-name="ri">
+          <img class="char-image" src="ri.png" alt="ri">
+          <span class="char-name">ri</span>
+        </button>
+        <button class="character-btn" data-char="🌼" data-name="Daisy">
+          <img class="char-image" src="daisy.png" alt="Daisy" style="margin-top: 4px;">
+          <span class="char-name">Daisy</span>
+        </button>
       </div>
       <div class="menu-buttons">
         <button class="menu-btn" id="restartGame">Try Again</button>
@@ -370,13 +383,15 @@ const BIRD_COUNT = 3;
 let unlockedCharacters = {
   '👸': true,
   '🐱': true,
-  '🐰': true
+  '🐰': true,
+  '🌼': false  // Daisy starts locked
 };
 
 const characterImages = {
   '🐱': new Image(),
   '🐰': new Image(),
-  '👸': new Image()
+  '👸': new Image(),
+  '🌼': new Image()  // Daisy image
 };
 
 characterImages['🐱'].onerror = function() {
@@ -388,10 +403,14 @@ characterImages['👸'].onerror = function() {
 characterImages['🐰'].onerror = function() {
   console.log('Failed to load Ping image, using emoji fallback');
 };
+characterImages['🌼'].onerror = function() {
+  console.log('Failed to load Daisy image, using emoji fallback');
+};
 
 characterImages['🐱'].src = 'socks.png';
 characterImages['👸'].src = 'ri.png';
 characterImages['🐰'].src = 'ping.png';
+characterImages['🌼'].src = 'daisy.png';  // Daisy image source
 
 // Enhanced Tree class with better visuals
 class Tree {
@@ -906,6 +925,17 @@ const player = {
         ctx.textBaseline = 'middle';
         ctx.fillText('🐰', 0, 0);
       }
+    } else if (this.character === '🌼') {
+      const img = characterImages['🌼'];
+      if (img.complete && img.naturalWidth !== 0) {
+        const imageSize = this.w * 1.5;
+        ctx.drawImage(img, -imageSize/2, -imageSize/2, imageSize, imageSize);
+      } else {
+        ctx.font = '64px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🌼', 0, 0);
+      }
     } else {
       ctx.font = '64px Arial';
       ctx.textAlign = 'center';
@@ -1287,6 +1317,27 @@ function updateScore(dt) {
   dist += (speed * dt) / 400;    // keep current scoring rate
   const score = Math.floor(dist);
   scoreEl.textContent = score + ' m';
+  
+  // Check for Daisy unlock at 1019 meters
+  if (score >= 1019 && !unlockedCharacters['🌼']) {
+    unlockedCharacters['🌼'] = true;
+    showUnlockNotification('🌼 Daisy', true);
+    updateCharacterButtons();
+  }
+}
+
+// Add unlock notification function
+function showUnlockNotification(character, isUnlock = true) {
+  const notification = document.createElement('div');
+  notification.className = 'unlock-notification';
+  notification.textContent = isUnlock ? `${character} unlocked!` : character;
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.parentNode.removeChild(notification);
+    }
+  }, 3000);
 }
 
 // collision
@@ -1521,11 +1572,16 @@ document.getElementById('backToMenu').addEventListener('click', () => {
 function updateCharacterButtons() {
   document.querySelectorAll('.character-btn').forEach(btn => {
     const char = btn.dataset.char;
-    // All characters are now unlocked by default
-    btn.classList.remove('locked');
-    btn.title = char === '👸' ? 'ri Character' : 
-               char === '🐱' ? 'Socks Character' : 
-               'Ping Character';
+    if (unlockedCharacters[char]) {
+      btn.classList.remove('locked');
+      btn.title = char === '👸' ? 'ri Character' : 
+                 char === '🐱' ? 'Socks Character' : 
+                 char === '🌼' ? 'Daisy Character' : 
+                 'Ping Character';
+    } else {
+      btn.classList.add('locked');
+      btn.title = 'Reach 1019m to unlock Daisy!';
+    }
   });
 }
 
@@ -1557,6 +1613,11 @@ function setupCharacterSelection() {
           });
         }
       });
+    } else {
+      // Show unlock message for locked characters
+      if (char === '🌼') {
+        showUnlockNotification('🌼 Reach 1019m to unlock Daisy', false);
+      }
     }
   }
 
@@ -1583,6 +1644,10 @@ function updateMenuCharacterSelects() {
       <button class="character-btn" data-char="🐰" data-name="Ping">
         <img class="char-image" src="ping.png" alt="Ping">
         <span class="char-name">Ping</span>
+      </button>
+      <button class="character-btn" data-char="🌼" data-name="Daisy">
+        <img class="char-image" src="daisy.png" alt="Daisy" style="margin-top: 4px;">
+        <span class="char-name">Daisy</span>
       </button>
     `;
   });
