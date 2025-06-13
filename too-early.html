@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Too Early</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #2F4F2F 0%, #6B8E3D 100%);
+      background-size: cover;
+      font-family: 'Playfair Display', serif;
+      color: #eaf5ea;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    
+    h1 {
+      font-size: 8rem;
+      font-weight: 700;
+      color: #c6ffcf;
+      text-shadow: 3px 3px 6px #000;
+      letter-spacing: 3px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    .back-link {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      color: #eaf5ea;
+      text-decoration: none;
+      font-size: 1.2rem;
+      padding: 10px 20px;
+      border: 2px solid #6B8E3D;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+    
+    .back-link:hover {
+      background: #6B8E3D;
+      color: #2F4F2F;
+    }
+  </style>
+</head>
+<body>
+  <a href="hmmm.html" class="back-link">← Back</a>
+  <h1>TOO EARLY</h1>
+</body>
+</html> 
