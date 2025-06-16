@@ -64,16 +64,6 @@
       z-index: 9999;
     }
     
-    .forest-deco {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      width: 100vw;
-      height: 180px;
-      background: url('forest-deco-top.png') repeat-x bottom left;
-      background-size: contain;
-      z-index: 1;
-      pointer-events: none;
-    }
     .sparkles {
       position: absolute;
       top: 0; left: 0; width: 100vw; height: 100vh;
@@ -125,7 +115,7 @@
     .mini-links {
       margin-top: 2.5rem;
       display: flex;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
       gap: 2.2rem;
       justify-content: center;
     }
@@ -186,26 +176,23 @@
   </style>
 </head>
 <body>
-  <audio autoplay loop id="forest-audio">
-    <source src="https://cdn.pixabay.com/download/audio/2021/08/09/audio_9823b67419.mp3?filename=forest-nature-ambience-9732.mp3" type="audio/mpeg">
-  </audio>
-  <div class="forest-deco"></div>
   <canvas class="sparkles"></canvas>
   <div class="progress-indicator">
     <div class="progress-bar"></div>
   </div>
   <div class="container">
     <h1>For RIRIBABY 💚</h1>
-    <a class="letter-link" href="letter.html">💌 Letter for Ri</a>
+    <a class="letter-link" href="games/letter/letter.html">💌 Letter for Ri</a>
     <div class="mini-links">
-      <a href="socks-clicker.html">🐾 Ri Runner</a>
-      <a href="mirror-selfie-memory.html">🪞 MemoRIes</a>
-      <a href="rat-cafe.html">🐀 Ri's Rat Cafe</a>
-      <a href="queen-ris-hive.html">🐝 Queen Ri's Hive</a>
+      <a href="games/ri-runner/socks-clicker.html">🐾 Ri Runner</a>
+      <a href="games/mirror-selfie-memory/mirror-selfie-memory.html">🪞 MemoRIes</a>
+      <a href="games/rat-cafe/rat-cafe.html">🐀 Ri's Rat Cafe</a>
+      <a href="games/queen-ris-hive/queen-ris-hive.html">🐝 Queen Ri's Hive</a>
+      <a href="games/tictactoe/Ri-index.html">⭕ Ri-Ra-Ro</a>
     </div>
   </div>
   <div style="position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); z-index: 100;">
-    <a href="hmmm.html" style="background: #355c4d; padding: 0.8rem 1.5rem; border-radius: 12px; text-decoration: none; color: #eaffea; font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; letter-spacing: 1px; box-shadow: 0 2px 10px rgba(0,0,0,0.18); border: 2px solid #6B8E3D; transition: background 0.2s, color 0.2s, box-shadow 0.2s; display: inline-block;">hmmm</a>
+    <a href="games/hmmm/hmmm.html" style="background: #355c4d; padding: 0.8rem 1.5rem; border-radius: 12px; text-decoration: none; color: #eaffea; font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; letter-spacing: 1px; box-shadow: 0 2px 10px rgba(0,0,0,0.18); border: 2px solid #6B8E3D; transition: background 0.2s, color 0.2s, box-shadow 0.2s; display: inline-block;">hmmm</a>
   </div>
   <script>
     // Sparkle effect for magic

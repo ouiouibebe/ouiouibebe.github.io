@@ -280,15 +280,15 @@
   </div>
 
   <div class="back-link" style="text-align: center; margin: 2rem auto; max-width: 800px;">
-    <a href="index.html" style="color: #4d7860; text-decoration: none; font-weight: 700; font-size: 1.1rem; font-family: 'Open Sans', sans-serif;">← Back to Forest Clearing</a>
+    <a href="../../index.html" style="color: #4d7860; text-decoration: none; font-weight: 700; font-size: 1.1rem; font-family: 'Open Sans', sans-serif;">← Back to Forest Clearing</a>
   </div>
 
   <audio id="bgMusic" loop>
-    <source src="Clairo - Glory Of The Snow (Instrumental).mp3" type="audio/mpeg">
+    <source src="../../assets/audio/Clairo - Glory Of The Snow (Instrumental).mp3" type="audio/mpeg">
   </audio>
 
   <audio id="jumpSound" preload="auto">
-    <source src="cartoon-jump-6462.mp3" type="audio/mpeg">
+    <source src="../../assets/audio/cartoon-jump-6462.mp3" type="audio/mpeg">
   </audio>
 
   <!-- Start Menu -->
@@ -297,21 +297,21 @@
       <h2>Ri Runner 🌲</h2>
       <div class="character-select">
         <button class="character-btn" data-char="👸" data-name="ri">
-          <img class="char-image" src="ri.png" alt="ri">
+          <img class="char-image" src="../../assets/images/ri.png" alt="ri">
           <span class="char-name">ri</span>
         </button>
         <button class="character-btn" data-char="🐱" data-name="Socks">
-          <img class="char-image" src="socks.png" alt="Socks" style="margin-top: 4px;">
+          <img class="char-image" src="../../assets/images/socks.png" alt="Socks" style="margin-top: 4px;">
           <span class="char-name">Socks</span>
         </button>
         <button class="character-btn" data-char="🐰" data-name="Ping">
-          <img class="char-image" src="ping.png" alt="Ping">
+          <img class="char-image" src="../../assets/images/ping.png" alt="Ping">
           <span class="char-name">Ping</span>
         </button>
       </div>
       <div class="menu-buttons">
         <button class="menu-btn" id="startGame">Start Game</button>
-        <a href="index.html" style="display: block; margin-top: 1rem; color: var(--txt-bright); text-decoration: none; font-weight: 600; font-size: 1.1rem;">← Back to Forest Clearing</a>
+        <a href="../../index.html" style="display: block; margin-top: 1rem; color: var(--txt-bright); text-decoration: none; font-weight: 600; font-size: 1.1rem;">← Back to Forest Clearing</a>
       </div>
     </div>
   </div>
@@ -324,26 +324,26 @@
       <div id="highScore"></div>
       <div class="character-select">
         <button class="character-btn" data-char="🐱" data-name="Socks">
-          <img class="char-image" src="socks.png" alt="Socks" style="margin-top: 4px;">
+          <img class="char-image" src="../../assets/images/socks.png" alt="Socks" style="margin-top: 4px;">
           <span class="char-name">Socks</span>
         </button>
         <button class="character-btn" data-char="🐰" data-name="Ping">
-          <img class="char-image" src="ping.png" alt="Ping">
+          <img class="char-image" src="../../assets/images/ping.png" alt="Ping">
           <span class="char-name">Ping</span>
         </button>
         <button class="character-btn" data-char="👸" data-name="ri">
-          <img class="char-image" src="ri.png" alt="ri">
+          <img class="char-image" src="../../assets/images/ri.png" alt="ri">
           <span class="char-name">ri</span>
         </button>
         <button class="character-btn" data-char="🌼" data-name="Daisy">
-          <img class="char-image" src="daisy.png" alt="Daisy" style="margin-top: 4px;">
+          <img class="char-image" src="../../assets/images/daisy.png" alt="Daisy" style="margin-top: 4px;">
           <span class="char-name">Daisy</span>
         </button>
       </div>
       <div class="menu-buttons">
         <button class="menu-btn" id="restartGame">Try Again</button>
         <button class="menu-btn" id="backToMenu">Main Menu</button>
-        <a href="index.html" style="display: block; margin-top: 1rem; color: var(--txt-bright); text-decoration: none; font-weight: 600; font-size: 1.1rem;">← Back to Forest Clearing</a>
+        <a href="../../index.html" style="display: block; margin-top: 1rem; color: var(--txt-bright); text-decoration: none; font-weight: 600; font-size: 1.1rem;">← Back to Forest Clearing</a>
       </div>
     </div>
   </div>
@@ -407,10 +407,10 @@ characterImages['🌼'].onerror = function() {
   console.log('Failed to load Daisy image, using emoji fallback');
 };
 
-characterImages['🐱'].src = 'socks.png';
-characterImages['👸'].src = 'ri.png';
-characterImages['🐰'].src = 'ping.png';
-characterImages['🌼'].src = 'daisy.png';  // Daisy image source
+characterImages['🐱'].src = '../../assets/images/socks.png';
+characterImages['👸'].src = '../../assets/images/ri.png';
+characterImages['🐰'].src = '../../assets/images/ping.png';
+characterImages['🌼'].src = '../../assets/images/daisy.png';  // Daisy image source
 
 // Enhanced Tree class with better visuals
 class Tree {
@@ -1634,19 +1634,19 @@ function updateMenuCharacterSelects() {
   document.querySelectorAll('.character-select').forEach(select => {
     select.innerHTML = `
       <button class="character-btn" data-char="👸" data-name="ri">
-        <img class="char-image" src="ri.png" alt="ri">
+        <img class="char-image" src="../../assets/images/ri.png" alt="ri">
         <span class="char-name">ri</span>
       </button>
       <button class="character-btn" data-char="🐱" data-name="Socks">
-        <img class="char-image" src="socks.png" alt="Socks" style="margin-top: 4px;">
+        <img class="char-image" src="../../assets/images/socks.png" alt="Socks" style="margin-top: 4px;">
         <span class="char-name">Socks</span>
       </button>
       <button class="character-btn" data-char="🐰" data-name="Ping">
-        <img class="char-image" src="ping.png" alt="Ping">
+        <img class="char-image" src="../../assets/images/ping.png" alt="Ping">
         <span class="char-name">Ping</span>
       </button>
       <button class="character-btn" data-char="🌼" data-name="Daisy">
-        <img class="char-image" src="daisy.png" alt="Daisy" style="margin-top: 4px;">
+        <img class="char-image" src="../../assets/images/daisy.png" alt="Daisy" style="margin-top: 4px;">
         <span class="char-name">Daisy</span>
       </button>
     `;

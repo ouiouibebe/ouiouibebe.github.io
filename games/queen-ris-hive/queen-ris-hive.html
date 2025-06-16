@@ -184,16 +184,16 @@
     <canvas id="gameCanvas" width="1200" height="600"></canvas>
     <div id="score">🌸 Score: 0 | Evil Bees: 0/7</div>
     <div class="back-link" style="text-align: center; margin-top: 1.5rem;">
-      <a href="index.html" style="color: var(--accent-dark); text-decoration: none; font-weight: 700; font-size: 1.1rem; font-family: 'Nunito', sans-serif;">← Back to Forest Clearing</a>
+      <a href="../../index.html" style="color: var(--accent-dark); text-decoration: none; font-weight: 700; font-size: 1.1rem; font-family: 'Nunito', sans-serif;">← Back to Forest Clearing</a>
     </div>
   </div>
 
   <audio id="bgMusic" loop>
-    <source src="Instrumental Cariño - The Marías.mp3" type="audio/mpeg">
+    <source src="../../assets/audio/Instrumental Cariño - The Marías.mp3" type="audio/mpeg">
   </audio>
 
   <audio id="bloomSound" preload="auto">
-    <source src="sharp-pop-328170.mp3" type="audio/mpeg">
+    <source src="../../assets/audio/sharp-pop-328170.mp3" type="audio/mpeg">
   </audio>
   <div id="startMenu" class="menu">
     <div class="menu-content">
@@ -206,7 +206,7 @@
       </div>
       <div class="menu-buttons">
         <button class="menu-btn" id="startGame">Start Flying</button>
-        <a href="index.html" style="color: var(--accent-dark); text-decoration: none; font-weight: 700; font-size: 1.1rem; font-family: 'Nunito', sans-serif; margin-top: 1rem; display: inline-block;">← Back to Forest Clearing</a>
+        <a href="../../index.html" style="color: var(--accent-dark); text-decoration: none; font-weight: 700; font-size: 1.1rem; font-family: 'Nunito', sans-serif; margin-top: 1rem; display: inline-block;">← Back to Forest Clearing</a>
       </div>
     </div>
   </div>
@@ -1189,7 +1189,7 @@ function drawPlanters() {
 
 // Load background image
 const backgroundImage = new Image();
-backgroundImage.src = 'forestgreenground.jpg';
+backgroundImage.src = '../../assets/images/forestgreenground.jpg';
 
 function drawBackground() {
   // Draw the background image, scaled to fill the canvas
