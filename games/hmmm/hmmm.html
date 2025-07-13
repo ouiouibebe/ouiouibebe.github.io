@@ -37,6 +37,17 @@
       z-index: 1;
     }
     
+    .clickable-shape {
+      pointer-events: auto;
+      cursor: pointer;
+      transition: transform 0.3s ease, text-shadow 0.3s ease;
+    }
+    
+    .clickable-shape:hover {
+      transform: scale(1.2);
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+    }
+    
     .shape {
       position: absolute;
       opacity: 0.1;
@@ -150,8 +161,8 @@
   </style>
 </head>
 <body>
-  <div class="floating-shapes">
-    <div class="shape">🔮</div>
+  <div class="floating-shapes" id="floating-shapes">
+    <div class="shape clickable-shape" onclick="spawnMysteriousEmojis()">🔮</div>
     <div class="shape">✨</div>
     <div class="shape">🌟</div>
     <div class="shape">💫</div>
@@ -228,6 +239,58 @@
     
     // Play ambient sound every 10 seconds
     setInterval(playAmbientSound, 10000);
+    
+    // Mysterious emoji spawning function
+    const mysteriousEmojis = ['🌙', '🦇', '🕷️', '🔥', '⚡', '🌪️', '🌊', '🌋', '🌌', '🔮', '🗝️', '🕯️', '🦉', '🐍', '🕸️', '💀', '👁️', '🌸', '🍄', '🌿'];
+    
+    function spawnMysteriousEmojis() {
+      const container = document.getElementById('floating-shapes');
+      const numEmojis = Math.floor(Math.random() * 3) + 2; // Spawn 2-4 emojis
+      
+      for (let i = 0; i < numEmojis; i++) {
+        const emoji = mysteriousEmojis[Math.floor(Math.random() * mysteriousEmojis.length)];
+        const shape = document.createElement('div');
+        shape.className = 'shape';
+        shape.textContent = emoji;
+        shape.style.top = Math.random() * 100 + '%';
+        shape.style.left = Math.random() * 100 + '%';
+        shape.style.animationDelay = Math.random() * 2 + 's';
+        shape.style.animationDuration = (Math.random() * 4 + 4) + 's';
+        
+        container.appendChild(shape);
+        
+        // Remove emoji after animation cycles
+        setTimeout(() => {
+          if (shape.parentNode) {
+            shape.parentNode.removeChild(shape);
+          }
+        }, 12000);
+      }
+      
+      // Play a subtle mystical sound
+      playMysticalSound();
+    }
+    
+    // Mystical sound for emoji spawning
+    function playMysticalSound() {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // Create a mystical chime sound
+      oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(440, audioContext.currentTime + 0.5);
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.02, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.5);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.5);
+    }
   </script>
 </body>
 </html> 

@@ -188,13 +188,14 @@
     </div>
   </div>
 
-  <audio id="bgMusic" loop>
-    <source src="../../assets/audio/Instrumental Cariño - The Marías.mp3" type="audio/mpeg">
-  </audio>
+
 
   <audio id="bloomSound" preload="auto">
     <source src="../../assets/audio/sharp-pop-328170.mp3" type="audio/mpeg">
   </audio>
+  
+  <script src="../../assets/radio.js"></script>
+  
   <div id="startMenu" class="menu">
     <div class="menu-content">
       <h2>Queen Ri's Hive 🐝</h2>
@@ -216,16 +217,16 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const scoreEl = document.getElementById('score');
 
-const bgMusic = document.getElementById('bgMusic');
-const bloomSound = document.getElementById('bloomSound');
+  // Radio system handles background music
+  const bloomSound = document.getElementById('bloomSound');
 
 // Add audio controls
 let isMuted = false;
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-function setupAudio() {
-  bgMusic.volume = 0.3;
-  bloomSound.volume = 0.6;
+  function setupAudio() {
+    // Radio system handles volume
+    bloomSound.volume = 0.6;
   // Add audio context resume on user interaction
   document.addEventListener('click', () => {
     if (audioContext.state === 'suspended') {
@@ -236,7 +237,7 @@ function setupAudio() {
 
 function toggleMute() {
   isMuted = !isMuted;
-  bgMusic.muted = isMuted;
+  gameRadio.setMuted(isMuted);
   bloomSound.muted = isMuted;
   this.textContent = isMuted ? '🔇 Sound Off' : '🔊 Sound On';
 }
@@ -933,7 +934,7 @@ function startGame() {
     let isMuted = false;
     soundBtn.addEventListener('click', () => {
       isMuted = !isMuted;
-      bgMusic.muted = isMuted;
+      gameRadio.setMuted(isMuted);
       bloomSound.muted = isMuted;
       soundBtn.textContent = isMuted ? '🔇 Sound Off' : '🔊 Sound On';
     });
@@ -942,9 +943,8 @@ function startGame() {
   last = performance.now();
   frameId = requestAnimationFrame(gameLoop);
   
-  // Play music with better error handling
-  bgMusic.currentTime = 0;
-  bgMusic.play().catch(err => console.log('Music play error:', err));
+      // Play music with better error handling
+    gameRadio.play();
 }
 
 document.getElementById('startGame').addEventListener('click', startGame);
@@ -1235,7 +1235,7 @@ window.addEventListener('DOMContentLoaded', () => {
     let isMuted = false;
     soundBtn.addEventListener('click', () => {
       isMuted = !isMuted;
-      bgMusic.muted = isMuted;
+      gameRadio.setMuted(isMuted);
       bloomSound.muted = isMuted;
       soundBtn.textContent = isMuted ? '🔇 Sound Off' : '🔊 Sound On';
     });

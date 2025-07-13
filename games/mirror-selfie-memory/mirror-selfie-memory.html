@@ -363,9 +363,7 @@
 
   <button id="soundToggleBtn" style="position: fixed; top: 30px; left: 30px; z-index: 1300; background: #fffbe6; color: #6B8E3D; border: 2px dashed #bfa76a; border-radius: 8px; padding: 0.5rem 1.2rem; font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 2px 4px 12px rgba(0,0,0,0.13);">🔊 Sound On</button>
 
-  <audio id="bgMusic" loop>
-    <source src="../../assets/audio/Alvvays - Ones Who Love You.mp3" type="audio/mpeg">
-  </audio>
+  <script src="../../assets/radio.js"></script>
 
   <script>
     // Game state
@@ -375,7 +373,7 @@
     let gameStarted = false;
     let startTime = null;
     let timerInterval = null;
-    const bgMusic = document.getElementById('bgMusic');
+    // Radio system handles background music
 
     // Image paths - replace these with your actual image files
     const images = [
@@ -468,11 +466,11 @@
         document.body.appendChild(soundBtn);
       }
       let isMuted = false;
-      soundBtn.addEventListener('click', () => {
-        isMuted = !isMuted;
-        bgMusic.muted = isMuted;
-        soundBtn.textContent = isMuted ? '🔇 Sound Off' : '🔊 Sound On';
-      });
+              soundBtn.addEventListener('click', () => {
+          isMuted = !isMuted;
+          gameRadio.setMuted(isMuted);
+          soundBtn.textContent = isMuted ? '🔇 Sound Off' : '🔊 Sound On';
+        });
       // Always hide sound button on start
       soundBtn.style.display = 'none';
     });
@@ -497,10 +495,8 @@
       document.getElementById('pairCount').textContent = '0';
       document.getElementById('victoryScreen').classList.add('hidden');
       
-      // Start music
-      bgMusic.volume = 0.3;
-      bgMusic.currentTime = 0;
-      bgMusic.play().catch(err => console.log('Music play error:', err));
+              // Start music
+        gameRadio.play();
       
       // Create new game grid
       createGameGrid();
@@ -579,10 +575,9 @@
       document.getElementById('pairCount').textContent = matchedPairs;
     }
 
-    function endGame() {
-      clearInterval(timerInterval);
-      bgMusic.pause();
-      bgMusic.currentTime = 0;
+          function endGame() {
+        clearInterval(timerInterval);
+        gameRadio.pause();
       
       // Show victory screen
       document.getElementById('finalMoves').textContent = moves;

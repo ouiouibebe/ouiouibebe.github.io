@@ -13,7 +13,6 @@ const restartBtnEl = document.querySelector('.restartBtn');
 const newGameBtn = document.querySelector('.newGameBtn');
 const avatarOptions = document.querySelectorAll('.avatar-option');
 const soundToggleBtn = document.getElementById('soundToggleBtn');
-const bgMusic = document.getElementById('bgMusic');
 
 // Game Variables
 let options = ["", "", "", "", "", "", "", "", ""];
@@ -69,25 +68,15 @@ function setupEventListeners() {
 
 // Setup audio
 function setupAudio() {
-    bgMusic.volume = 0.3;
-    bgMusic.preload = 'auto';
-    
-    // Preload the audio file
-    bgMusic.load();
-    
     // Add audio context resume on user interaction
     document.addEventListener('click', () => {
-        if (bgMusic.paused) {
-            bgMusic.play().catch(err => console.log('Music play error:', err));
-        }
+        gameRadio.play();
     }, { once: true });
     
     // Try to start music immediately on page load
     document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
-            if (bgMusic.paused) {
-                bgMusic.play().catch(err => console.log('Music play error:', err));
-            }
+            gameRadio.play();
         }, 100);
     });
 }
@@ -95,7 +84,7 @@ function setupAudio() {
 // Toggle mute
 function toggleMute() {
     isMuted = !isMuted;
-    bgMusic.muted = isMuted;
+    gameRadio.setMuted(isMuted);
     soundToggleBtn.textContent = isMuted ? '🔇 Sound Off' : '🔊 Sound On';
 }
 
@@ -167,9 +156,7 @@ function showGameSetup() {
     setDefaultAvatarSelections();
     
     // Start background music if not already playing
-    if (bgMusic.paused) {
-        bgMusic.play().catch(err => console.log('Music play error:', err));
-    }
+    gameRadio.play();
 }
 
 // Start the game
