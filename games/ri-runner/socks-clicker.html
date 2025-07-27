@@ -145,6 +145,7 @@
       justify-content: center;
       gap: 1.2rem;
       margin: 1.5rem 0;
+      flex-wrap: wrap;
     }
 
     .character-btn {
@@ -227,6 +228,154 @@
       color: var(--txt-bright);
       text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
     }
+
+    /* New compact character selection system */
+    .character-select-compact {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .character-select-btn {
+      background: var(--accent);
+      color: var(--txt-bright);
+      border: 2px solid var(--accent-dark);
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: "Nunito", sans-serif;
+      font-weight: 700;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .character-select-btn:hover {
+      background: var(--accent-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .character-select-btn .current-char {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+
+    /* Skin selection modal */
+    .skin-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+      backdrop-filter: blur(8px);
+    }
+
+    .skin-modal.hidden {
+      display: none;
+    }
+
+    .skin-modal-content {
+      background: var(--panel);
+      padding: 2rem;
+      border-radius: 16px;
+      text-align: center;
+      max-width: 1000px;
+      width: 95%;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    }
+
+    .skin-modal h3 {
+      font-family: "Playfair Display", serif;
+      font-size: 1.8rem;
+      color: var(--txt-bright);
+      margin: 0 0 1.5rem 0;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    }
+
+    .skin-preview {
+      margin: 1.5rem 0;
+      padding: 1rem;
+      background: rgba(0,0,0,0.2);
+      border-radius: 12px;
+      border: 2px solid var(--accent);
+    }
+
+    .skin-preview img {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      border-radius: 8px;
+      margin: 0 auto;
+      display: block;
+    }
+
+    .skin-preview .skin-name {
+      font-family: "Playfair Display", serif;
+      font-size: 1.3rem;
+      color: var(--txt-bright);
+      margin-top: 0.5rem;
+      font-weight: 700;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    }
+
+    .skin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .skin-option {
+      background: var(--panel);
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+      padding: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .skin-option:hover {
+      transform: translateY(-3px);
+      border-color: var(--txt-bright);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .skin-option.selected {
+      border-color: var(--txt-bright);
+      background: var(--accent);
+      box-shadow: 0 0 15px rgba(255,255,255,0.3);
+    }
+
+    .skin-option img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      border-radius: 8px;
+      margin: 0 auto 0.5rem auto;
+      display: block;
+    }
+
+    .skin-option .skin-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--txt-bright);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    }
     
     .unlock-notification {
       position: fixed;
@@ -293,23 +442,19 @@
   <div id="startMenu" class="menu">
     <div class="menu-content">
       <h2>Ri Runner 🌲</h2>
-      <div class="character-select">
-        <button class="character-btn" data-char="👸" data-name="ri">
-          <img class="char-image" src="../../assets/images/ri.png" alt="ri">
-          <span class="char-name">ri</span>
-        </button>
-        <button class="character-btn" data-char="🐱" data-name="Socks">
-          <img class="char-image" src="../../assets/images/socks.png" alt="Socks" style="margin-top: 4px;">
-          <span class="char-name">Socks</span>
-        </button>
-        <button class="character-btn" data-char="🐰" data-name="Ping">
-          <img class="char-image" src="../../assets/images/ping.png" alt="Ping">
-          <span class="char-name">Ping</span>
+      <div class="character-select-compact">
+        <button class="character-select-btn" id="characterSelectBtn">
+          <img class="current-char" src="../../assets/images/ri.png" alt="Current Character">
+          <span>Select Character</span>
         </button>
       </div>
       <div class="menu-buttons">
         <button class="menu-btn" id="startGame">Start Game</button>
         <a href="../../index.html" style="display: block; margin-top: 1rem; color: var(--txt-bright); text-decoration: none; font-weight: 600; font-size: 1.1rem;">← Back to Forest Clearing</a>
+      </div>
+      <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--accent);">
+        <input type="password" id="unlockPassword" placeholder="Enter unlock code..." style="width: 100%; padding: 0.5rem; border: 1px solid var(--accent); border-radius: 6px; background: var(--panel); color: var(--txt-bright); font-family: 'Nunito', sans-serif; margin-bottom: 0.5rem;">
+        <button class="menu-btn" id="unlockBtn" style="width: 100%; padding: 0.5rem; font-size: 0.9rem;">Unlock</button>
       </div>
     </div>
   </div>
@@ -320,28 +465,36 @@
       <h2>Game Over</h2>
       <div id="finalScore"></div>
       <div id="highScore"></div>
-      <div class="character-select">
-        <button class="character-btn" data-char="🐱" data-name="Socks">
-          <img class="char-image" src="../../assets/images/socks.png" alt="Socks" style="margin-top: 4px;">
-          <span class="char-name">Socks</span>
-        </button>
-        <button class="character-btn" data-char="🐰" data-name="Ping">
-          <img class="char-image" src="../../assets/images/ping.png" alt="Ping">
-          <span class="char-name">Ping</span>
-        </button>
-        <button class="character-btn" data-char="👸" data-name="ri">
-          <img class="char-image" src="../../assets/images/ri.png" alt="ri">
-          <span class="char-name">ri</span>
-        </button>
-        <button class="character-btn" data-char="🌼" data-name="Daisy">
-          <img class="char-image" src="../../assets/images/daisy.png" alt="Daisy" style="margin-top: 4px;">
-          <span class="char-name">Daisy</span>
+      <div class="character-select-compact">
+        <button class="character-select-btn" id="characterSelectBtn2">
+          <img class="current-char" src="../../assets/images/ri.png" alt="Current Character">
+          <span>Select Character</span>
         </button>
       </div>
       <div class="menu-buttons">
         <button class="menu-btn" id="restartGame">Try Again</button>
         <button class="menu-btn" id="backToMenu">Main Menu</button>
         <a href="../../index.html" style="display: block; margin-top: 1rem; color: var(--txt-bright); text-decoration: none; font-weight: 600; font-size: 1.1rem;">← Back to Forest Clearing</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skin Selection Modal -->
+  <div id="skinModal" class="skin-modal hidden">
+    <div class="skin-modal-content">
+      <h3 id="skinModalTitle">Select Character</h3>
+      <div class="skin-preview">
+        <img id="skinPreviewImg" src="../../assets/images/ri.png" alt="Character Preview">
+        <div class="skin-name" id="skinPreviewName">Ri</div>
+      </div>
+      <div class="skin-grid" id="skinGrid">
+        <!-- Skin options will be populated by JavaScript -->
+      </div>
+      <div class="menu-buttons">
+        <button class="menu-btn" id="confirmSkin">Confirm</button>
+        <button class="menu-btn" id="selectSkins" style="display: none;">Select Skins</button>
+        <button class="menu-btn" id="backToCharacters" style="display: none;">Back to Characters</button>
+        <button class="menu-btn" id="cancelSkin">Cancel</button>
       </div>
     </div>
   </div>
@@ -376,6 +529,70 @@ const TREE_COUNT = 8;
 const CLOUD_COUNT = 4;
 const BIRD_COUNT = 3;
 
+// Character and skin system
+const characters = {
+  '👸': {
+    name: 'ri',
+    skins: {
+      'default': {
+        name: 'Ri',
+        image: '../../assets/images/ri.png',
+        emoji: '👸'
+      },
+      'scottish1': {
+        name: 'Scottish Ri',
+        image: '../../assets/images/scottishri.png',
+        emoji: '🏴󠁧󠁢󠁳󠁣󠁴󠁿'
+      },
+      'scottish2': {
+        name: 'Scottish RiRi',
+        image: '../../assets/images/scottishri1.png',
+        emoji: '🏴󠁧󠁢󠁳󠁣󠁴󠁿'
+      },
+      'scottish3': {
+        name: 'Scottish Ouiouibebe',
+        image: '../../assets/images/scottishri2.png',
+        emoji: '🏴󠁧󠁢󠁳󠁣󠁴󠁿'
+      }
+    }
+  },
+  '🐱': {
+    name: 'Socks',
+    skins: {
+      'default': {
+        name: 'Socks',
+        image: '../../assets/images/socks.png',
+        emoji: '🐱'
+      },
+      'tabby': {
+        name: 'Tabby Manipulator',
+        image: '../../assets/images/socksmm.png',
+        emoji: '🐱'
+      }
+    }
+  },
+  '🐰': {
+    name: 'Ping',
+    skins: {
+      'default': {
+        name: 'Ping',
+        image: '../../assets/images/ping.png',
+        emoji: '🐰'
+      }
+    }
+  },
+  '🌼': {
+    name: 'Daisy',
+    skins: {
+      'default': {
+        name: 'Daisy',
+        image: '../../assets/images/daisy.png',
+        emoji: '🌼'
+      }
+    }
+  }
+};
+
 let unlockedCharacters = {
   '👸': true,
   '🐱': true,
@@ -383,30 +600,51 @@ let unlockedCharacters = {
   '🌼': false  // Daisy starts locked
 };
 
-const characterImages = {
-  '🐱': new Image(),
-  '🐰': new Image(),
-  '👸': new Image(),
-  '🌼': new Image()  // Daisy image
+// Password system for unlocking content
+const unlockPasswords = {
+  'daisy': ['🌼'],  // Unlock Daisy character
+  'labubu': ['🐱_tabby']  // Unlock Tabby Manipulator skin
 };
 
-characterImages['🐱'].onerror = function() {
-  console.log('Failed to load Socks image, using emoji fallback');
-};
-characterImages['👸'].onerror = function() {
-  console.log('Failed to load ri image, using emoji fallback');
-};
-characterImages['🐰'].onerror = function() {
-  console.log('Failed to load Ping image, using emoji fallback');
-};
-characterImages['🌼'].onerror = function() {
-  console.log('Failed to load Daisy image, using emoji fallback');
+
+
+let unlockedSkins = {
+  '👸_default': true,
+  '👸_scottish1': true,
+  '👸_scottish2': true,
+  '👸_scottish3': true,
+  '🐱_default': true,
+  '🐱_tabby': false,
+  '🐰_default': true,
+  '🌼_default': true
 };
 
-characterImages['🐱'].src = '../../assets/images/socks.png';
-characterImages['👸'].src = '../../assets/images/ri.png';
-characterImages['🐰'].src = '../../assets/images/ping.png';
-characterImages['🌼'].src = '../../assets/images/daisy.png';  // Daisy image source
+// Current character and skin selection
+let currentCharacter = '👸';
+let currentSkin = 'default';
+
+// Skin image cache
+const skinImages = {};
+
+// Preload all skin images
+function preloadSkinImages() {
+  Object.keys(characters).forEach(charKey => {
+    const character = characters[charKey];
+    Object.keys(character.skins).forEach(skinKey => {
+      const skin = character.skins[skinKey];
+      const imageKey = `${charKey}_${skinKey}`;
+      skinImages[imageKey] = new Image();
+      skinImages[imageKey].src = skin.image;
+      
+      skinImages[imageKey].onerror = function() {
+        console.log(`Failed to load ${imageKey} image, using emoji fallback`);
+};
+    });
+  });
+}
+
+// Initialize skin images
+preloadSkinImages();
 
 // Enhanced Tree class with better visuals
 class Tree {
@@ -888,55 +1126,22 @@ const player = {
     ctx.save();
     ctx.translate(this.x + this.w/2, this.y + this.h/2);
     
-    if (this.character === '🐱') {
-      const img = characterImages['🐱'];
-      if (img.complete && img.naturalWidth !== 0) {
+    // Get current character and skin
+    const character = characters[currentCharacter];
+    const skin = character.skins[currentSkin];
+    const imageKey = `${currentCharacter}_${currentSkin}`;
+    const img = skinImages[imageKey];
+    
+
+    
+    if (img && img.complete && img.naturalWidth !== 0) {
         const imageSize = this.w * 1.5;
         ctx.drawImage(img, -imageSize/2, -imageSize/2, imageSize, imageSize);
       } else {
         ctx.font = '64px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('🐱', 0, 0);
-      }
-    } else if (this.character === '👸') {
-      const img = characterImages['👸'];
-      if (img.complete && img.naturalWidth !== 0) {
-        const imageSize = this.w * 1.5;
-        ctx.drawImage(img, -imageSize/2, -imageSize/2, imageSize, imageSize);
-      } else {
-        ctx.font = '64px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('👸', 0, 0);
-      }
-    } else if (this.character === '🐰') {
-      const img = characterImages['🐰'];
-      if (img.complete && img.naturalWidth !== 0) {
-        const imageSize = this.w * 1.5;
-        ctx.drawImage(img, -imageSize/2, -imageSize/2, imageSize, imageSize);
-      } else {
-        ctx.font = '64px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('🐰', 0, 0);
-      }
-    } else if (this.character === '🌼') {
-      const img = characterImages['🌼'];
-      if (img.complete && img.naturalWidth !== 0) {
-        const imageSize = this.w * 1.5;
-        ctx.drawImage(img, -imageSize/2, -imageSize/2, imageSize, imageSize);
-      } else {
-        ctx.font = '64px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('🌼', 0, 0);
-      }
-    } else {
-      ctx.font = '64px Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(this.character, 0, 0);
+      ctx.fillText(skin.emoji, 0, 0);
     }
     
     ctx.restore();
@@ -1314,19 +1519,14 @@ function updateScore(dt) {
   const score = Math.floor(dist);
   scoreEl.textContent = score + ' m';
   
-  // Check for Daisy unlock at 1019 meters
-  if (score >= 1019 && !unlockedCharacters['🌼']) {
-    unlockedCharacters['🌼'] = true;
-    showUnlockNotification('🌼 Daisy', true);
-    updateCharacterButtons();
-  }
+  // Distance-based unlocks removed - now using password system
 }
 
 // Add unlock notification function
-function showUnlockNotification(character, isUnlock = true) {
+function showUnlockNotification(message, isUnlock = true) {
   const notification = document.createElement('div');
   notification.className = 'unlock-notification';
-  notification.textContent = isUnlock ? `${character} unlocked!` : character;
+  notification.textContent = message;
   document.body.appendChild(notification);
   
   setTimeout(() => {
@@ -1563,104 +1763,293 @@ document.getElementById('backToMenu').addEventListener('click', () => {
   document.getElementById('startMenu').classList.remove('hidden');
 });
 
-// Update character buttons in both menus
-function updateCharacterButtons() {
-  document.querySelectorAll('.character-btn').forEach(btn => {
-    const char = btn.dataset.char;
-    if (unlockedCharacters[char]) {
-      btn.classList.remove('locked');
-      btn.title = char === '👸' ? 'ri Character' : 
-                 char === '🐱' ? 'Socks Character' : 
-                 char === '🌼' ? 'Daisy Character' : 
-                 'Ping Character';
-    } else {
-      btn.classList.add('locked');
-      btn.title = 'Reach 1019m to unlock Daisy!';
-    }
+// New character and skin selection system
+function updateCharacterSelectButtons() {
+  const character = characters[currentCharacter];
+  const skin = character.skins[currentSkin];
+  
+  // Update both character select buttons
+  document.querySelectorAll('.character-select-btn').forEach(btn => {
+    const img = btn.querySelector('.current-char');
+    img.src = skin.image;
+    img.alt = `${character.name} - ${skin.name}`;
   });
 }
 
-// Update character selection system with proper player update
-function setupCharacterSelection() {
-  // Function to handle character selection
-  function selectCharacter(char, btn) {
-    if (unlockedCharacters[char]) {
-      // Remove selected class from all buttons in the same menu
-      const menu = btn.closest('.character-select');
-      menu.querySelectorAll('.character-btn').forEach(b => b.classList.remove('selected'));
-      
-      // Add selected class to clicked button
-      btn.classList.add('selected');
-      
-      // Update player character immediately
-      player.character = char;
-      console.log('Character changed to:', char); // Debug log
-      
-      // Update all other menus to match selection
-      document.querySelectorAll('.character-select').forEach(otherMenu => {
-        if (otherMenu !== menu) {
-          otherMenu.querySelectorAll('.character-btn').forEach(otherBtn => {
-            if (otherBtn.dataset.char === char) {
-              otherBtn.classList.add('selected');
-            } else {
-              otherBtn.classList.remove('selected');
-            }
-          });
+function showCharacterModal() {
+  const modal = document.getElementById('skinModal');
+  const title = document.getElementById('skinModalTitle');
+  const previewImg = document.getElementById('skinPreviewImg');
+  const previewName = document.getElementById('skinPreviewName');
+  const grid = document.getElementById('skinGrid');
+  const backBtn = document.getElementById('backToCharacters');
+  const selectSkinsBtn = document.getElementById('selectSkins');
+  
+  // Set modal title
+  title.textContent = 'Select Character';
+  
+  // Hide back button and show select skins button for character selection
+  backBtn.style.display = 'none';
+  selectSkinsBtn.style.display = 'inline-block';
+  
+        // Update preview with current character
+      const currentCharacterData = characters[currentCharacter];
+      const currentSkinData = currentCharacterData.skins[currentSkin];
+      previewImg.src = currentSkinData.image;
+      previewName.textContent = currentSkinData.name;
+  
+  // Populate character grid
+  grid.innerHTML = '';
+  Object.keys(characters).forEach(charKey => {
+    const character = characters[charKey];
+    
+    // Check if character is unlocked
+    if (!unlockedCharacters[charKey]) {
+      const lockedOption = document.createElement('div');
+      lockedOption.className = 'skin-option locked';
+      lockedOption.innerHTML = `
+        <img src="${character.skins.default.image}" alt="${character.name}" style="filter: grayscale(0.8); opacity: 0.6;">
+        <div class="skin-name">${character.name} 🔒</div>
+      `;
+      lockedOption.addEventListener('click', () => {
+        if (charKey === '🌼') {
+          showUnlockNotification('Locked...Hint: what do u call her?', false);
+        } else {
+          showUnlockNotification('Locked. Maybe there\'s a code...', false);
         }
       });
-    } else {
-      // Show unlock message for locked characters
-      if (char === '🌼') {
-        showUnlockNotification('🌼 Reach 1019m to unlock Daisy', false);
-      }
+      grid.appendChild(lockedOption);
+      return;
     }
-  }
-
-  // Setup click handlers for all character buttons
-  document.querySelectorAll('.character-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      selectCharacter(btn.dataset.char, btn);
-    });
-  });
-}
-
-// Update menu character buttons with ri.png and adjusted socks positioning
-function updateMenuCharacterSelects() {
-  document.querySelectorAll('.character-select').forEach(select => {
-    select.innerHTML = `
-      <button class="character-btn" data-char="👸" data-name="ri">
-        <img class="char-image" src="../../assets/images/ri.png" alt="ri">
-        <span class="char-name">ri</span>
-      </button>
-      <button class="character-btn" data-char="🐱" data-name="Socks">
-        <img class="char-image" src="../../assets/images/socks.png" alt="Socks" style="margin-top: 4px;">
-        <span class="char-name">Socks</span>
-      </button>
-      <button class="character-btn" data-char="🐰" data-name="Ping">
-        <img class="char-image" src="../../assets/images/ping.png" alt="Ping">
-        <span class="char-name">Ping</span>
-      </button>
-      <button class="character-btn" data-char="🌼" data-name="Daisy">
-        <img class="char-image" src="../../assets/images/daisy.png" alt="Daisy" style="margin-top: 4px;">
-        <span class="char-name">Daisy</span>
-      </button>
+    
+    const charOption = document.createElement('div');
+    charOption.className = 'skin-option';
+    if (charKey === currentCharacter) {
+      charOption.classList.add('selected');
+      // Set initial temporary selection for current character
+      window.tempCharacterSelection = charKey;
+      window.tempSkinSelection = 'default';
+    }
+    
+    charOption.innerHTML = `
+      <img src="${character.skins.default.image}" alt="${character.name}">
+      <div class="skin-name">${character.name}</div>
     `;
+    
+    charOption.addEventListener('click', () => {
+      // Remove selected from all options
+      grid.querySelectorAll('.skin-option').forEach(opt => opt.classList.remove('selected'));
+      // Add selected to clicked option
+      charOption.classList.add('selected');
+      
+      // Update preview
+      previewImg.src = character.skins.default.image;
+      previewName.textContent = character.name;
+      
+      // Store temporary selections
+      window.tempCharacterSelection = charKey;
+      window.tempSkinSelection = 'default';
+      
+
+    });
+    
+    grid.appendChild(charOption);
   });
   
-  setupCharacterSelection();
+  modal.classList.remove('hidden');
 }
 
-updateMenuCharacterSelects();
-updateCharacterButtons();
 
-const initialChar = '👸';
-document.querySelectorAll('.character-select').forEach(select => {
-  const btn = select.querySelector(`[data-char="${initialChar}"]`);
-  if (btn) {
-    btn.classList.add('selected');
+
+function hideSkinModal() {
+  document.getElementById('skinModal').classList.add('hidden');
+  window.tempSkinSelection = null;
+  window.tempCharacterSelection = null;
+  window.skinSelectionCharacter = null;
+}
+
+function confirmCharacterSelection() {
+  if (window.tempCharacterSelection) {
+    // Apply character selection
+    currentCharacter = window.tempCharacterSelection;
+    currentSkin = 'default';
+    updateCharacterSelectButtons();
+    hideSkinModal();
+  } else if (window.tempSkinSelection) {
+    // Apply skin selection
+    currentSkin = window.tempSkinSelection;
+    // Update character to the one we were showing skins for
+    if (window.skinSelectionCharacter) {
+      currentCharacter = window.skinSelectionCharacter;
+    }
+    updateCharacterSelectButtons();
+    hideSkinModal();
+  }
+}
+
+function showSkinModalForCharacter(characterKey) {
+  const modal = document.getElementById('skinModal');
+  const title = document.getElementById('skinModalTitle');
+  const previewImg = document.getElementById('skinPreviewImg');
+  const previewName = document.getElementById('skinPreviewName');
+  const grid = document.getElementById('skinGrid');
+  const backBtn = document.getElementById('backToCharacters');
+  const selectSkinsBtn = document.getElementById('selectSkins');
+  
+  // Set modal title
+  title.textContent = `Select ${characters[characterKey].name} Skin`;
+  
+  // Show back button and hide select skins button
+  backBtn.style.display = 'inline-block';
+  selectSkinsBtn.style.display = 'none';
+  
+  // Update preview
+  const currentSkinData = characters[characterKey].skins['default'];
+  previewImg.src = currentSkinData.image;
+  previewName.textContent = currentSkinData.name;
+  
+
+  
+  // Populate skin grid for the SPECIFIED character
+  grid.innerHTML = '';
+  Object.keys(characters[characterKey].skins).forEach(skinKey => {
+    const skin = characters[characterKey].skins[skinKey];
+    const skinKeyFull = `${characterKey}_${skinKey}`;
+    const skinOption = document.createElement('div');
+    
+
+    
+    // Check if skin is unlocked
+    if (!unlockedSkins[skinKeyFull]) {
+      skinOption.className = 'skin-option locked';
+      skinOption.innerHTML = `
+        <img src="${skin.image}" alt="${skin.name}" style="filter: grayscale(0.8); opacity: 0.6;">
+        <div class="skin-name">${skin.name} 🔒</div>
+      `;
+      skinOption.addEventListener('click', () => {
+        if (skinKeyFull === '🐱_tabby') {
+          showUnlockNotification('Locked...Hint: peak consumerism fluff', false);
+        } else {
+          showUnlockNotification('Locked. Maybe there\'s a code...', false);
+        }
+      });
+      grid.appendChild(skinOption);
+      return;
+    }
+    
+    skinOption.className = 'skin-option';
+    if (skinKey === 'default') {
+      skinOption.classList.add('selected');
+    }
+    
+    skinOption.innerHTML = `
+      <img src="${skin.image}" alt="${skin.name}">
+      <div class="skin-name">${skin.name}</div>
+    `;
+    
+    skinOption.addEventListener('click', () => {
+      // Remove selected from all options
+      grid.querySelectorAll('.skin-option').forEach(opt => opt.classList.remove('selected'));
+      // Add selected to clicked option
+      skinOption.classList.add('selected');
+      
+      // Update preview
+      previewImg.src = skin.image;
+      previewName.textContent = skin.name;
+      
+      // Store temporary selection
+      window.tempSkinSelection = skinKey;
+      window.skinSelectionCharacter = characterKey;
+    });
+    
+    grid.appendChild(skinOption);
+  });
+  
+  modal.classList.remove('hidden');
+}
+
+function showSkinModal() {
+  showSkinModalForCharacter(currentCharacter);
+}
+
+// Setup character selection buttons
+function setupCharacterSelection() {
+  document.querySelectorAll('.character-select-btn').forEach(btn => {
+    btn.addEventListener('click', showCharacterModal);
+  });
+  
+  // Setup modal buttons
+  document.getElementById('confirmSkin').addEventListener('click', confirmCharacterSelection);
+  document.getElementById('selectSkins').addEventListener('click', () => {
+    // Use the temporary character selection if available, otherwise use current character
+    const characterToShow = window.tempCharacterSelection || currentCharacter;
+    // Store the character we're showing skins for
+    window.skinSelectionCharacter = characterToShow;
+    // Clear tempCharacterSelection so skin selection takes priority
+    window.tempCharacterSelection = null;
+    showSkinModalForCharacter(characterToShow);
+  });
+  document.getElementById('backToCharacters').addEventListener('click', showCharacterModal);
+  document.getElementById('cancelSkin').addEventListener('click', hideSkinModal);
+  
+  // Close modal when clicking outside
+  document.getElementById('skinModal').addEventListener('click', (e) => {
+    if (e.target.id === 'skinModal') {
+      hideSkinModal();
+    }
+  });
+}
+
+// Password unlock functionality
+function unlockWithPassword(password) {
+  const lowerPassword = password.toLowerCase();
+  let unlocked = false;
+  
+  if (unlockPasswords[lowerPassword]) {
+    unlockPasswords[lowerPassword].forEach(item => {
+      if (item.includes('_')) {
+        // Unlock skin
+        unlockedSkins[item] = true;
+        showUnlockNotification('Skin unlocked!', true);
+      } else {
+        // Unlock character
+        unlockedCharacters[item] = true;
+        showUnlockNotification('Daisy unlocked!', true);
+      }
+      unlocked = true;
+    });
+  }
+  
+  if (!unlocked) {
+    showUnlockNotification('Invalid unlock code', false);
+  }
+  
+  return unlocked;
+}
+
+// Setup password unlock button
+document.getElementById('unlockBtn').addEventListener('click', () => {
+  const password = document.getElementById('unlockPassword').value;
+  if (password.trim()) {
+    unlockWithPassword(password);
+    document.getElementById('unlockPassword').value = '';
   }
 });
-player.character = initialChar;
+
+// Allow Enter key to unlock
+document.getElementById('unlockPassword').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    const password = e.target.value;
+    if (password.trim()) {
+      unlockWithPassword(password);
+      e.target.value = '';
+    }
+  }
+});
+
+// Initialize character selection
+setupCharacterSelection();
+updateCharacterSelectButtons();
 
 window.addEventListener('keydown', e => {
   if (gameStarted && !gameOver && e.code === 'Space') {
