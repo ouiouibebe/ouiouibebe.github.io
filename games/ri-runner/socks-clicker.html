@@ -422,10 +422,14 @@
 <body>
   <div id="shell">
     <h1>Ri Runner 🌲</h1>
-    <div id="gameContainer">
-      <canvas id="gameCanvas" width="1200" height="400"></canvas>
-      <div id="score">0 m</div>
+      <div id="gameContainer">
+    <canvas id="gameCanvas" width="1200" height="400"></canvas>
+    <div id="score">0 m</div>
+    <div id="freeModeIndicator" style="display: none; position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: white; padding: 10px 20px; border-radius: 10px; font-family: 'Nunito', sans-serif; font-weight: 700; text-align: center;">
+      <div>Free Mode - Explore your skins!</div>
+      <div style="font-size: 0.8rem; margin-top: 5px;">WASD/Arrows to move, Space to jump, ESC to menu</div>
     </div>
+  </div>
   </div>
 
   <div class="back-link" style="text-align: center; margin: 2rem auto; max-width: 800px;">
@@ -449,7 +453,8 @@
         </button>
       </div>
       <div class="menu-buttons">
-        <button class="menu-btn" id="startGame">Start Game</button>
+        <button class="menu-btn" id="startGame">Ri Runner</button>
+        <button class="menu-btn" id="freeMode">Free Mode</button>
         <a href="../../index.html" style="display: block; margin-top: 1rem; color: var(--txt-bright); text-decoration: none; font-weight: 600; font-size: 1.1rem;">← Back to Forest Clearing</a>
       </div>
       <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--accent);">
@@ -521,6 +526,7 @@ let   highScore  = localStorage.getItem('highScore') || 0;
 
 let gameStarted = false;
 let gameOver = false;
+let freeMode = false;
 
 const trees = [];
 const clouds = [];
@@ -1122,9 +1128,9 @@ const player = {
   jumping: false,
   originalX: 120,
   character: '🐱',
+  targetX: 120, // For smooth movement in free mode
   draw() {
     ctx.save();
-    ctx.translate(this.x + this.w/2, this.y + this.h/2);
     
     // Get current character and skin
     const character = characters[currentCharacter];
@@ -1132,41 +1138,79 @@ const player = {
     const imageKey = `${currentCharacter}_${currentSkin}`;
     const img = skinImages[imageKey];
     
-
-    
-    if (img && img.complete && img.naturalWidth !== 0) {
+    if (freeMode) {
+      // In free mode, draw from bottom center to avoid cutoff
+      const imageSize = this.w * 2.5;
+      const drawX = this.x + this.w/2;
+      const drawY = this.y + this.h/2 - imageSize * 0.3; // Move up to show full character
+      
+      ctx.translate(drawX, drawY);
+      
+      if (img && img.complete && img.naturalWidth !== 0) {
+        ctx.drawImage(img, -imageSize/2, -imageSize/2, imageSize, imageSize);
+      } else {
+        ctx.font = '96px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(skin.emoji, 0, 0);
+      }
+    } else {
+      // Normal game mode
+      ctx.translate(this.x + this.w/2, this.y + this.h/2);
+      
+      if (img && img.complete && img.naturalWidth !== 0) {
         const imageSize = this.w * 1.5;
         ctx.drawImage(img, -imageSize/2, -imageSize/2, imageSize, imageSize);
       } else {
         ctx.font = '64px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-      ctx.fillText(skin.emoji, 0, 0);
+        ctx.fillText(skin.emoji, 0, 0);
+      }
     }
     
     ctx.restore();
   },
   update() {
-    if(this.jumping) {
-      this.vy += GRAVITY;
-      this.y += this.vy;
-      
-      if (this.vx > 0) {
-        this.x += this.vx;
-        this.vx *= 0.9;
+    if (freeMode) {
+      // Free mode movement - smooth horizontal movement
+      if (this.jumping) {
+        this.vy += GRAVITY;
+        this.y += this.vy;
         
-        if (this.x > this.originalX + 40) {
-          this.x = this.originalX + 40;
-          this.vx = 0;
+        if (this.y >= GROUND_Y) {
+          this.y = GROUND_Y;
+          this.jumping = false;
+          this.vy = 0;
         }
       }
       
-      if(this.y >= GROUND_Y) {
-        this.y = GROUND_Y;
-        this.jumping = false;
-        this.vy = 0;
-        this.vx = 0;
-        this.x = this.originalX;
+      // Smooth horizontal movement
+      const dx = this.targetX - this.x;
+      this.x += dx * 0.1; // Smooth interpolation
+    } else {
+      // Normal game mode
+      if(this.jumping) {
+        this.vy += GRAVITY;
+        this.y += this.vy;
+        
+        if (this.vx > 0) {
+          this.x += this.vx;
+          this.vx *= 0.9;
+          
+          if (this.x > this.originalX + 40) {
+            this.x = this.originalX + 40;
+            this.vx = 0;
+          }
+        }
+        
+        if(this.y >= GROUND_Y) {
+          this.y = GROUND_Y;
+          this.jumping = false;
+          this.vy = 0;
+          this.vx = 0;
+          this.x = this.originalX;
+        }
       }
     }
   },
@@ -1577,12 +1621,12 @@ function loop(now){
 
   // Draw background elements in depth order
   mountains.forEach(mountain => {
-    mountain.update();
+    if (!freeMode) mountain.update();
     mountain.draw();
   });
 
   clouds.forEach(cloud => {
-    cloud.update();
+    if (!freeMode) cloud.update();
     cloud.draw();
   });
   
@@ -1609,28 +1653,28 @@ function loop(now){
   
   // Draw hills before trees to ground them
   hills.forEach(hill => {
-    hill.update();
+    if (!freeMode) hill.update();
     hill.draw();
   });
   
   particles.forEach(particle => {
-    particle.update();
+    if (!freeMode) particle.update();
     particle.draw();
   });
 
   birds.forEach(bird => {
-    bird.update();
+    if (!freeMode) bird.update();
     bird.draw();
   });
 
   trees.forEach(tree => {
-    tree.update();
+    if (!freeMode) tree.update();
     tree.draw();
   });
   
   // Draw ground cover after trees for layering
   groundCover.forEach(cover => {
-    cover.update();
+    if (!freeMode) cover.update();
     cover.draw();
   });
 
@@ -1663,24 +1707,26 @@ function loop(now){
   // player
   player.update(); player.draw();
 
-  // obstacles
-  spawnTimer += dt;
-  if(spawnTimer > getSpawnInterval()) {
-    spawnObstacle();
-    spawnTimer = 0;
-  }
-  obstacles.forEach(o => { o.update(); o.draw(); });
-  // remove off-screen
-  while(obstacles.length && obstacles[0].offscreen) obstacles.shift();
+  // obstacles (only in normal mode)
+  if (!freeMode) {
+    spawnTimer += dt;
+    if(spawnTimer > getSpawnInterval()) {
+      spawnObstacle();
+      spawnTimer = 0;
+    }
+    obstacles.forEach(o => { o.update(); o.draw(); });
+    // remove off-screen
+    while(obstacles.length && obstacles[0].offscreen) obstacles.shift();
 
-  // collision check
-  for(const o of obstacles){
-    if(hit(player,o)) return showDeathMenu();
-  }
+    // collision check
+    for(const o of obstacles){
+      if(hit(player,o)) return showDeathMenu();
+    }
 
-  // speed ramp + score
-  speed += (accel*dt)*(1 + Math.floor(dist)/2000);
-  updateScore(dt);
+    // speed ramp + score
+    speed += (accel*dt)*(1 + Math.floor(dist)/2000);
+    updateScore(dt);
+  }
 
   frameId = requestAnimationFrame(loop);
 }
@@ -1693,6 +1739,16 @@ function start(){
   player.y = GROUND_Y;
   player.vy = 0;
   player.jumping = false;
+  
+  // Position player in middle for free mode
+  if (freeMode) {
+    player.x = canvas.width / 2;
+    player.targetX = canvas.width / 2;
+  } else {
+    player.x = 120;
+    player.targetX = 120;
+  }
+  
   gameStarted = true;
   gameOver = false;
   initBackground();
@@ -1729,10 +1785,36 @@ function start(){
     });
   }
   soundBtn.style.display = 'block';
+  
+  // Show/hide free mode indicator
+  const freeModeIndicator = document.getElementById('freeModeIndicator');
+  if (freeMode) {
+    freeModeIndicator.style.display = 'block';
+    document.getElementById('score').style.display = 'none';
+  } else {
+    freeModeIndicator.style.display = 'none';
+    document.getElementById('score').style.display = 'block';
+  }
+  
   last = performance.now();
   frameId = requestAnimationFrame(loop);
   
   gameRadio.play();
+}
+
+function showStartMenu() {
+  gameStarted = false;
+  gameOver = false;
+  freeMode = false;
+  cancelAnimationFrame(frameId);
+  document.getElementById('startMenu').classList.remove('hidden');
+  document.getElementById('deathMenu').classList.add('hidden');
+  
+  // Hide sound button
+  const soundBtn = document.getElementById('soundToggleBtn');
+  if (soundBtn) soundBtn.style.display = 'none';
+  
+  gameRadio.pause();
 }
 
 function showDeathMenu() {
@@ -1756,7 +1838,14 @@ function showDeathMenu() {
 }
 
 // Menu event listeners
-document.getElementById('startGame').addEventListener('click', start);
+document.getElementById('startGame').addEventListener('click', () => {
+  freeMode = false;
+  start();
+});
+document.getElementById('freeMode').addEventListener('click', () => {
+  freeMode = true;
+  start();
+});
 document.getElementById('restartGame').addEventListener('click', start);
 document.getElementById('backToMenu').addEventListener('click', () => {
   document.getElementById('deathMenu').classList.add('hidden');
@@ -2052,9 +2141,26 @@ setupCharacterSelection();
 updateCharacterSelectButtons();
 
 window.addEventListener('keydown', e => {
-  if (gameStarted && !gameOver && e.code === 'Space') {
-    e.preventDefault();
-    player.jump();
+  if (gameStarted && !gameOver) {
+    if (e.code === 'Space') {
+      e.preventDefault();
+      player.jump();
+    }
+    
+    if (freeMode) {
+      if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+        e.preventDefault();
+        player.targetX = Math.max(50, player.targetX - 20);
+      }
+      if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+        e.preventDefault();
+        player.targetX = Math.min(canvas.width - 100, player.targetX + 20);
+      }
+      if (e.code === 'Escape') {
+        e.preventDefault();
+        showStartMenu();
+      }
+    }
   }
 });
 
