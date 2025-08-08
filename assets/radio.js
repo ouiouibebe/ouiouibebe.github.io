@@ -23,6 +23,7 @@ class GameRadio {
     // Map each game to its default track based on current game page
     const path = window.location.pathname;
     if (path.includes('ri-runner') || path.includes('socks-clicker')) return 'clairo';
+    if (path.includes('ri-slicer')) return 'clairo';
     if (path.includes('rat-cafe')) return 'dominic';
     if (path.includes('mirror-selfie-memory')) return 'alvvays';
     if (path.includes('queen-ris-hive')) return 'marias';
