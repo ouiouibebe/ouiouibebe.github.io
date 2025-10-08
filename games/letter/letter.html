@@ -79,20 +79,8 @@
   </style>
 </head>
 <body>
-  <div id="passwordOverlay" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(47,79,47,0.97);z-index:2000;display:flex;align-items:center;justify-content:center;">
-    <div style="background:#fffbe6;border:3px dashed #bfa76a;border-radius:18px;box-shadow:0 0 40px rgba(0,0,0,0.18);padding:2.5rem 2rem;max-width:350px;width:90%;text-align:center;">
-      <div style="font-family:'Playfair Display',serif;font-size:1.5rem;color:#8B6914;margin-bottom:1.2rem;letter-spacing:1px;">💌 Enter the Secret Word</div>
-      <input id="pwInput" type="password" placeholder="Password" style="width:80%;padding:0.7rem 1rem;font-size:1.1rem;border-radius:8px;border:2px solid #bfa76a;margin-bottom:1.2rem;font-family:'Nunito',sans-serif;outline:none;" autocomplete="off" />
-      <br/>
-      <button id="pwBtn" style="background:#6B8E3D;color:#fffbe6;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;border-radius:8px;border:2px solid #bfa76a;padding:0.6rem 1.5rem;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,0.10);">Open Letter</button>
-      <div id="pwError" style="color:#8B0000;font-size:1rem;margin-top:1rem;display:none;font-family:'Nunito',sans-serif;"></div>
-      <div style="margin-top:2.2rem;text-align:center;">
-        <a href="../../index.html" style="color:#6B8E3D;text-decoration:none;font-weight:700;font-size:1.1rem;font-family:'Playfair Display',serif;background:#eaf5ea;padding:0.7rem 1.5rem;border-radius:10px;border:2px solid #bfa76a;transition:background 0.2s, color 0.2s;display:inline-block;">← Back to Forest Clearing</a>
-      </div>
-    </div>
-  </div>
-  <div class="container" style="filter:none;">
-    <h1>💌 3 Months With Ri</h1>
+  <div class="container">
+    <h1>💌 3 Months With Ri (06/08/2025)</h1>
     <div class="date" style="text-align:right; color:#bfa76a; font-size:1rem; margin-bottom:1.5rem;">June 8th, 2025</div>
     <div class="letter">
       <p>ri i wanted to write you this because it's our first anniversary not together, and i felt the need to look back at some of my favorite moments with you sweetie. this is gonna be my brain dump of feels in place of having u in my arms (let me preface that this is not written well)</p>
@@ -113,35 +101,8 @@
       <div class="signoff">-bae (sujay)</div>
     </div>
     <div class="back-link">
-      <a href="../../index.html">← Back to Forest Clearing</a>
+      <a href="index.html">← Back to Letters</a>
     </div>
   </div>
-  <script>
-    // Password protection logic
-    const overlay = document.getElementById('passwordOverlay');
-    const input = document.getElementById('pwInput');
-    const btn = document.getElementById('pwBtn');
-    const error = document.getElementById('pwError');
-    const container = document.querySelector('.container');
-    function checkPassword() {
-      if (input.value === 'ouiouibebe') {
-        overlay.style.display = 'none';
-        container.style.filter = 'none';
-      } else {
-        error.textContent = 'That is not the secret word! Try again.';
-        error.style.display = 'block';
-        input.value = '';
-        input.focus();
-      }
-    }
-    btn.addEventListener('click', checkPassword);
-    input.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') checkPassword();
-    });
-    window.addEventListener('DOMContentLoaded', () => {
-      input.focus();
-      container.style.filter = 'blur(6px)';
-    });
-  </script>
 </body>
 </html> 
